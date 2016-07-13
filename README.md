@@ -78,9 +78,6 @@ lines with N characters on each. 1-9 and A-Z are used to indicate filled cells;
 0 is used to indicate an empty cell.
 
 ### Output
-The output should consist of test results. The first line of each case matches
-the name of the test case from the input; the next N lines follow the same
-format as the input, solved according to the rules of Su Doku.
-
-Test results need not be in the same order as they appeared in the input, but
-they must have the same names.
+The output follows the same format as the input; however, all of the puzzles
+must be solved according to the rules of Su Doku. The outputs need not be in the
+same order as the inputs, but they must have the same names.
