@@ -41,3 +41,7 @@ propagation in parallel. Simple enough.
 
 I wrote up an ICPC-like definition in the README. Now to write up a verifier-
 "is this a valid solution for the problem"?
+
+## 2016-07-12 Tue 22:00
+I'll treat the validator as its own binary- `verify`- with inputs in files
+rather than ICPC's stdin / stdout convention. Easy enough to framework that up.
