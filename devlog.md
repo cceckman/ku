@@ -34,5 +34,10 @@ problem with a database! That's a good start; I'll want to put it in
 [ICPC](https://icpc.baylor.edu/) form for familiarity (hat tip
 @aaronbloomfield.)
 
-## 2016-07-12 Tue 21:20
 
+## 2016-07-12 Tue 21:47
+Yeah, the norgig.com link about is the strategy I was thinking of- constraint
+propagation in parallel. Simple enough.
+
+I wrote up an ICPC-like definition in the README. Now to write up a verifier-
+"is this a valid solution for the problem"?
