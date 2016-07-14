@@ -31,8 +31,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	in, inErr := read(*input)
-	out, outErr := read(*output)
+	_, inErr := read(*input)
+	_, outErr := read(*output)
 
 	if inErr != nil {
 		log.Printf("Error reading input: %v", inErr)
