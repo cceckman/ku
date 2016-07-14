@@ -88,6 +88,53 @@ func TestSinglePuzzle(t *testing.T) {
 			t.Errorf("BoxOf test %d failed: got: %v expected: %v", n, p.RowOf(test[0]), test[3])
 		}
 	}
+	// Spot-check Row:
+	for idx, row := range map[int][]int{
+		0: []int{0, 0, 0, 0, 0, 0, 0, 0, 1,},
+		6: []int{5, 0, 4, 0, 6, 0, 0, 9, 0,},
+		8: []int{3, 0, 0, 0, 0, 0, 7, 0, 0,},
+	} {
+		gotRow := p.Row(idx)
+		if len(gotRow) != len(row) {
+			t.Errorf("Row %d test failed: got: %v expected: %v", idx, gotRow, row)
+		}
+		for i := range row {
+			if gotRow[i] != row[i] {
+				t.Errorf("Row %d test failed: got: %v expected: %v", idx, gotRow, row)
+			}
+		}
+	}
+	// Spot-check Col:
+	for idx, col := range map[int][]int{
+		0: []int{0, 6, 0, 0, 0, 0, 5, 0, 3,},
+		4: []int{0, 9, 4, 7, 0, 3, 6, 0, 0,},
+	} {
+		gotCol := p.Col(idx)
+		if len(gotCol) != len(col) {
+			t.Errorf("Col %d test failed: got: %v expected: %v", idx, gotCol, col)
+		}
+		for i := range col {
+			if gotCol[i] != col[i] {
+				t.Errorf("Col %d test failed: got: %v expected: %v", idx, gotCol, col)
+			}
+		}
+	}
+	// Spot-check Box:
+	for idx, box := range map[int][]int{
+		0: []int{0, 0, 0, 6, 0, 3, 0, 7, 9,},
+		4: []int{0, 5, 0, 0, 0, 0, 0, 0, 0,},
+		8: []int{0, 9, 0, 0, 0, 4, 7, 0, 0,},
+	} {
+		gotBox := p.Box(idx)
+		if len(gotBox) != len(box) {
+			t.Errorf("Box %d test failed: got: %v expected: %v", idx, gotBox, box)
+		}
+		for i := range box {
+			if gotBox[i] != box[i] {
+				t.Errorf("Box %d test failed: got: %v expected: %v", idx, gotBox, box)
+			}
+		}
+	}
 
 	// Test "print"; should match input.
 	output := bytes.NewBuffer(make([]byte, 0, len(firstCase)))
