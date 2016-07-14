@@ -2,6 +2,7 @@ package sudoku
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
 )
@@ -68,5 +69,37 @@ func TestSinglePuzzle(t *testing.T) {
 	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
 	if output.String() != firstCase {
 		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, firstCase)
+	}
+}
+
+// TestTwoPuzzles confirms that reading one puzzle after another, from the same reader, works correctly.
+// This also gets tested as part of collection_test, but test it here explicitly.
+func TestTwoPuzzles(t *testing.T) {
+	firstReader := strings.NewReader(firstCase)
+	secondReader := strings.NewReader(secondCase)
+	r := io.MultiReader(firstReader, secondReader)
+
+	firstPuzzle, err := NewPuzzle(3, r)
+	if err != nil {
+		t.Errorf("got error when loading first puzzle: %v", err)
+	}
+	secondPuzzle, err := NewPuzzle(3, r)
+	if err != nil {
+		t.Errorf("got error when loading second puzzle: %v", err)
+	}
+	if firstPuzzle.name != firstName {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", firstPuzzle.name, firstName)
+	}
+	if secondPuzzle.name != secondName {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", secondPuzzle.name, secondName)
+	}
+
+	// Test "print"; should match input.
+	output := bytes.NewBuffer(make([]byte, 0, len(secondCase)))
+	secondPuzzle.Print(output)
+
+	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
+	if output.String() != (secondCase + "\n") {
+		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, secondCase)
 	}
 }

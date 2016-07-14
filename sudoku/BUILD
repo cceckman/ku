@@ -13,4 +13,5 @@ go_test(
     name = "puzzle_test",
     srcs = ["puzzle_test.go"],
     library = ":go_default_library",
+    size = "small",
     )
