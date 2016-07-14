@@ -9,9 +9,9 @@ import (
 )
 
 type Puzzle struct {
-	name string
+	Name string
 	Size int
-	grid []uint64 // a Size-by-Size grid in row-major order.
+	Value []uint64 // a Size-by-Size grid in row-major order.
 }
 
 // Load a single puzzle from the Reader.
@@ -63,21 +63,21 @@ func NewPuzzle(size int, r io.Reader) (*Puzzle, error) {
 	}
 
 	return &Puzzle{
-		name: name,
+		Name: name,
 		Size: size,
-		grid: grid,
+		Value: grid,
 	}, nil
 }
 
 // Prints a puzzle to the Writer.
 func (p *Puzzle) Print(w io.Writer) {
-	fmt.Fprintf(w, "%s\n", p.name)
+	fmt.Fprintf(w, "%s\n", p.Name)
 	// Lines
 	dimSq := p.Size * p.Size
 	for i := 0; i < dimSq; i++ {
 		// Columns
 		for j := 0; j < dimSq; j++ {
-			v := p.grid[i*dimSq+j]
+			v := p.Value[i*dimSq+j]
 			s := strconv.FormatUint(v, base)
 			fmt.Fprint(w, s)
 		}
@@ -108,7 +108,7 @@ func (p *Puzzle) ColOf(cell int) int {
 // Col gives the indeces of the cells in the given row.
 func (p *Puzzle) Col(col int) []int {
 	dimSq := p.Size * p.Size
-	r := make([]int, p.Size)
+	r := make([]int, dimSq)
 	for i := 0; i < dimSq; i++ {
 		r[i] = i*dimSq + col
 	}
@@ -152,7 +152,7 @@ func (p *Puzzle) Box(box int) []int {
 	//1	 27 28 29 30 31 32 33 34 35
 
 	dimSq := p.Size * p.Size
-	r := make([]int, p.Size)
+	r := make([]int, dimSq)
 
 	// Base row for this box
 	//bRow := (box / p.Size) * p.Size
@@ -165,4 +165,10 @@ func (p *Puzzle) Box(box int) []int {
 		r[i] = row*dimSq + col
 	}
 	return r
+}
+
+// Utility: pretty-print an index, for debugging.
+func (p *Puzzle) CellInfo(idx int) string {
+	return fmt.Sprintf("idx: %d value: %d r: %d c: %d b: %d",
+		idx, p.Value[idx], p.RowOf(idx), p.ColOf(idx), p.BoxOf(idx))
 }

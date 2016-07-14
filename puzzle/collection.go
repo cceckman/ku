@@ -14,7 +14,7 @@ const (
 )
 
 type Collection struct {
-	puzzles []*Puzzle
+	Puzzles []*Puzzle
 	Size    int
 }
 
@@ -57,19 +57,19 @@ func NewCollection(r io.Reader) (*Collection, error) {
 			return nil, err
 		}
 
-		if _, ok := names[puzzle.name]; ok {
-			return nil, fmt.Errorf("Duplicate puzzle name %s", puzzle.name)
+		if _, ok := names[puzzle.Name]; ok {
+			return nil, fmt.Errorf("Duplicate puzzle name %s", puzzle.Name)
 		}
-		result.puzzles = append(result.puzzles, puzzle)
-		names[puzzle.name] = true
+		result.Puzzles = append(result.Puzzles, puzzle)
+		names[puzzle.Name] = true
 	}
 
 	return result, nil
 }
 
 func (p *Collection) Print(w io.Writer) {
-	fmt.Fprintf(w, "%d %d\n", p.Size, len(p.puzzles))
-	for _, puzzle := range p.puzzles {
+	fmt.Fprintf(w, "%d %d\n", p.Size, len(p.Puzzles))
+	for _, puzzle := range p.Puzzles {
 		puzzle.Print(w)
 	}
 }

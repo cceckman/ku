@@ -67,8 +67,8 @@ func TestSinglePuzzle(t *testing.T) {
 	if err != nil {
 		t.Errorf("got error when loading first puzzle: %v", err)
 	}
-	if p.name != firstName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", p.name, firstName)
+	if p.Name != firstName {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", p.Name, firstName)
 	}
 
 	// Spot-check RowOf, ColOf, BoxOf; test case is index, row, column, box.
@@ -114,11 +114,11 @@ func TestTwoPuzzles(t *testing.T) {
 	if err != nil {
 		t.Errorf("got error when loading second puzzle: %v", err)
 	}
-	if firstPuzzle.name != firstName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", firstPuzzle.name, firstName)
+	if firstPuzzle.Name != firstName {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", firstPuzzle.Name, firstName)
 	}
-	if secondPuzzle.name != secondName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", secondPuzzle.name, secondName)
+	if secondPuzzle.Name != secondName {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", secondPuzzle.Name, secondName)
 	}
 
 	// Test "print"; should match input.

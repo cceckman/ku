@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 	"log"
+	"os"
 
 	"github.com/cceckman/ku/puzzle"
 )
@@ -22,7 +22,6 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Verifies that the file in output contains solutions to input. It returns nonzero if the solutions are incomplete or invalid.\n")
 	}
 }
-
 
 func main() {
 	flag.Parse()
@@ -58,4 +57,3 @@ func read(name string) (*puzzle.Collection, error) {
 
 	return collection, err
 }
-

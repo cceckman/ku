@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
 go_binary(
     name = "verify",
@@ -12,11 +12,14 @@ go_library(
     deps = ["//puzzle:go_default_library"],
 )
 
-sh_test(
-    name = "suite_a_test",
-    srcs = ["suite_a_test.sh"],
+go_test(
+    name = "verify_test",
+    srcs = ["verify_test.go"],
     data = [
-        ":verify",
         "//testdata:suite-a",
+    ],
+    library = ":go_default_library",
+    deps = [
+        "//puzzle:go_default_library",
     ],
 )
