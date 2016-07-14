@@ -13,10 +13,10 @@ go_library(
 )
 
 go_test(
-    name = "sudoku_test",
+    name = "puzzle_test",
     size = "small",
     srcs = [
-        "sudoku_test.go",
+        "puzzle_test.go",
     ],
     library = ":go_default_library",
 )

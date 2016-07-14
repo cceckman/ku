@@ -6,7 +6,7 @@ import (
 	"os"
 	"log"
 
-	"github.com/cceckman/ku/sudoku"
+	"github.com/cceckman/ku/puzzle"
 )
 
 var (
@@ -49,12 +49,12 @@ func main() {
 }
 
 // Load from file. Don't bother doing it in the background yet.
-func read(name string) (*sudoku.PuzzleCollection, error) {
+func read(name string) (*puzzle.PuzzleCollection, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
-	collection, err := sudoku.NewCollection(file)
+	collection, err := puzzle.NewCollection(file)
 
 	return collection, err
 }
