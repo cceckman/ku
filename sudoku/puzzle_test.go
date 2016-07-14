@@ -1,6 +1,7 @@
 package sudoku
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -15,7 +16,8 @@ const (
 000030000
 504060090
 006008004
-300000700`
+300000700
+`
 	secondCase = `Case 4
 198734265
 564192378
@@ -57,5 +59,14 @@ func TestSinglePuzzle(t *testing.T) {
 		if p.BoxOf(test[0]) != test[3] {
 			t.Errorf("BoxOf test %d failed: got: %v expected: %v", n, p.RowOf(test[0]), test[3])
 		}
+	}
+
+	// Test "print"; should match input.
+	output := bytes.NewBuffer(make([]byte, 0, len(firstCase)))
+	p.Print(output)
+
+	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
+	if output.String() != firstCase {
+		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, firstCase)
 	}
 }
