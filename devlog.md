@@ -114,4 +114,12 @@ unmarshalled- not timing the IO- is going to be a better indication of the
 things I'm interested in: - the impact of parallelism, function calls,
 virtual functions, etc.
 
+## 2016-07-14 Thu 16:26
+I note in a comment in 52a39245 - something's weird about the Bazel test
+infrastructure, but I'm on a plane without the resources to figure out what. I
+get verify_test running, and I can confirm that $PWD/testdata/suite-a.good.txt
+exists... but Open("testdata/suite-a.good.txt") doesn't work. I have to
+explicitly add in the evaluated "PWD".
 
+Something something $RUNFILES... but there isn't a GO_RUNFILES or RUNFILES in
+the environment. Bleh.
