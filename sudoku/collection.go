@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 )
 
-const(
-	maxDim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle. 
+const (
+	maxDim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle.
 )
 
 type PuzzleCollection struct {
-	puzzles map[string]*Puzzle
+	puzzles   map[string]*Puzzle
 	dimension int
 }
 
@@ -26,11 +27,10 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 		return nil, err
 	}
 
-	dimension, err := strconv.Atoi(dimStr)
+	dimension, err := strconv.Atoi(strings.Trim(dimStr, " "))
 	if err != nil {
 		return nil, err
 	}
-
 
 	if dimension > maxDim {
 		return nil, fmt.Errorf("Dimension %d of input exceeds maximum dimension %d", dimension, maxDim)
@@ -41,11 +41,10 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 		return nil, err
 	}
 
-	count, err := strconv.Atoi(countStr)
+	count, err := strconv.Atoi(strings.Trim(countStr, "\n "))
 	if err != nil {
 		return nil, err
 	}
-
 
 	results := make(map[string]*Puzzle)
 
@@ -62,7 +61,7 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 	}
 
 	return &PuzzleCollection{
-		puzzles: results,
+		puzzles:   results,
 		dimension: dimension,
 	}, nil
 }

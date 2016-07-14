@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 )
 
 type Puzzle struct {
@@ -20,14 +21,17 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 	if err != nil {
 		return nil, err
 	}
+	name = strings.Trim(name, "\n")
 
 	var grid []uint64
 	for x := 0; x < dimension; x++ {
 		// Read a line into the grid, parsing it to ints.
 		line, err := buf.ReadString('\n')
-		if err != nil {
+		if err != nil && err != io.EOF {
+			// EOF is okay; we read that at the last line.
 			return nil, err
 		}
+		line = strings.Trim(line, "\n")
 
 		if len(line) != dimension {
 			return nil, fmt.Errorf("Line for case %q has %d elements, not %d", name, len(line), dimension)
@@ -41,7 +45,7 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 			}
 
 			n := uint64(dimension)
-			if i > n * n {
+			if i > n*n {
 				return nil, fmt.Errorf("Value %d is outside of the limits of dimension %d", i, dimension)
 			}
 

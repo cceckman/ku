@@ -34,52 +34,34 @@ func main() {
 	in, inErr := read(*input)
 	out, outErr := read(*output)
 
-	var inputs, outputs *sudoku.PuzzleCollection
-
-	for n := 0; n < 2; _ = 1 {
-		select {
-			case err := <-inErr:
-				log.Fatalf("error reading input: %v", err)
-			case err := <-outErr:
-				log.Fatalf("error reading output: %v", err)
-			case inputs = <-in:
-				n = n + 1
-			case outputs = <-out:
-				n = n + 1
-			}
+	if inErr != nil {
+		log.Printf("Error reading input: %v", inErr)
+	}
+	if outErr != nil {
+		log.Printf("Error reading output: %v", outErr)
+	}
+	if inErr != nil || outErr != nil {
+		log.Fatalf("Fatal error!")
 	}
 
 	fmt.Printf("Inputs and outputs ready! \n")
 
 	fmt.Printf("Input:\n")
-	inputs.Print(os.Stdout)
+	in.Print(os.Stdout)
 
 
 	fmt.Printf("Output:\n")
-	outputs.Print(os.Stdout)
+	out.Print(os.Stdout)
 }
 
-// Load from file, in background.
-func read(name string) (<-chan *sudoku.PuzzleCollection, <-chan error) {
-	resultChan := make(chan *sudoku.PuzzleCollection)
-	errChan := make(chan error)
-	go func() {
-		defer close(errChan)
-		defer close(resultChan)
-		file, err := os.Open(name)
-		if err != nil {
-			errChan <- err
-		}
-		defer file.Close()
+// Load from file. Don't bother doing it in the background yet.
+func read(name string) (*sudoku.PuzzleCollection, error) {
+	file, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	collection, err := sudoku.NewCollection(file)
 
-		collection, err := sudoku.NewCollection(file)
-
-		if err != nil {
-			errChan <- err
-		}
-		resultChan <- collection
-	}()
-
-	return resultChan, errChan
+	return collection, err
 }
 
