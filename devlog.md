@@ -72,3 +72,18 @@ it works fine. Well, okay, a little more:
 ```
 pbpaste | tr ' ' '0' | sed 's/[[:space:]]//g'
 ```
+
+## 2016-07-14 Thu 10:10
+Alright, now actually implementing a bit of the logic- like, indexing, as a
+prerequisite for being able to verify. Not doing any optimizations at this
+point; I want to make all optimizations tweakable / optional, s.t. we can
+basically turn it all off or on at any point.
+
+Of course, there's a drawback there- abstraction / virtualization -> runtime
+overhead, which has a performance impact. There's probably a middle ground...
+hm, maybe at the build level? Rather than using interfaces (virtualization),
+write different concerete types that implement the same interface?
+
+Wait, I said I wasn't doing optimzation yet. :-P So, sure, let's get a verifier
+and solver first. (But, yeah, a few different build targets sounds like a not
+horrible idea for *this*, even if it's not great generally.)

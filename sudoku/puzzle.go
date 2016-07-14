@@ -11,7 +11,7 @@ import (
 type Puzzle struct {
 	name      string
 	dimension int
-	grid      []uint64
+	grid      []uint64 // a dimension-by-dimension grid in row-major order.
 }
 
 // Load a single puzzle from the Reader.
@@ -83,4 +83,86 @@ func (p *Puzzle) Print(w io.Writer) {
 		}
 		fmt.Fprintln(w, "")
 	}
+}
+
+// RowOf gives the row of the given cell.
+func (p *Puzzle) RowOf(cell int) int {
+	return cell / (p.dimension * p.dimension)
+}
+
+// Row gives the indeces of the cells in the given row.
+func (p *Puzzle) Row(row int) []int {
+	dimSq := p.dimension * p.dimension
+	r := make([]int, dimSq)
+	for i := 0; i < dimSq; i++ {
+		r[i] = row * dimSq + i
+	}
+	return r;
+}
+
+// ColOf gives the column of the given cell.
+func (p *Puzzle) ColOf(cell int) int {
+	return cell % (p.dimension * p.dimension)
+}
+
+// Col gives the indeces of the cells in the given row.
+func (p *Puzzle) Col(col int) []int {
+	dimSq := p.dimension * p.dimension
+	r := make([]int, p.dimension)
+	for i := 0; i < dimSq; i++ {
+		r[i] = i * dimSq + col
+	}
+	return r;
+}
+
+// BoxOf gives the "box" of the given cell- which NxN subdivision the cell is in.
+// Subdivisions are numbered from the top-left, starting at zero, row-major order.
+func (p *Puzzle) BoxOf(cell int) int {
+	// Grid, with Row and Col:
+	// 	  0  1  2  3  4  5  6  7  8
+	//0	  0  1  2  3  4  5  6  7  8
+	//1	  9 10 11 12 13 14 15 16 17
+	//2	 18 19 20 21 22 23 24 25 26
+	//3	 27 28 29 30 31 32 33 34 35
+	// Col / dimension, row / dimension
+	// 	  0  0  0  1  1  1  2  2  2
+	//0	  0  1  2  3  4  5  6  7  8
+	//0	  9 10 11 12 13 14 15 16 17
+	//0	 18 19 20 21 22 23 24 25 26
+	//1	 27 28 29 30 31 32 33 34 35
+	// Col / dimension + (row / dimension) * dimension
+	// 	  0  0  0  1  1  1  2  2  2
+	//0	  0  0  0  1  1  1  6  7  8
+	//0	  0 00  0	 1  1  1 15 16 17
+	//0	 00 00 00  1  1  1 24 25 26
+	//3	  3 28 29  4 31 32 33 34 35
+	// row - (row % dimension) is easier to compute- mod and sub are faster operations.
+	row := p.RowOf(cell)
+	col := p.ColOf(cell)
+	return (col / p.dimension) + (row - (row % p.dimension))
+}
+
+// Box gives the indices of cells in the given box.
+// Boxes are indexed in English-order: left to right, then the next row. 0 is in the upper-left.
+func (p *Puzzle) Box(box int) []int {
+	// 	  0  0  0  1  1  1  2  2  2
+	//0	  0  1  2  3  4  5  6  7  8
+	//0	  9 10 11 12 13 14 15 16 17
+	//0	 18 19 20 21 22 23 24 25 26
+	//1	 27 28 29 30 31 32 33 34 35
+
+	dimSq := p.dimension * p.dimension
+	r := make([]int, p.dimension)
+
+	// Base row for this box
+	//bRow := (box / p.dimension) * p.dimension
+	bRow := box - (box % p.dimension)
+	// Base column for this box
+	bCol := (box % p.dimension) * p.dimension
+	for i := 0; i < dimSq; i++ {
+		col := bCol + (i % p.dimension)
+		row := bRow + (i / p.dimension)
+		r[i] = row * dimSq + col
+	}
+	return r;
 }
