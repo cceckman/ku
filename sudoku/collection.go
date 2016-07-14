@@ -49,7 +49,9 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 	results := make(map[string]*Puzzle)
 
 	for i := 0; i < count; i++ {
-		puzzle, err := NewPuzzle(dimension, r)
+		// Pass in the already-buffered reader, as it may have already forwarded the read pointer in 'r'
+		// past where we're interestd in.
+		puzzle, err := NewPuzzle(dimension, buf)
 		if err != nil {
 			return nil, err
 		}

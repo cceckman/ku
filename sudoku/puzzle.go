@@ -19,11 +19,15 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 	buf := bufio.NewReader(r)
 	name, err := buf.ReadString('\n')
 	if err != nil {
+		if err == io.EOF {
+			return nil, fmt.Errorf("reached EOF early after reading %q: %v", name, err)
+		}
 		return nil, err
 	}
 	name = strings.Trim(name, "\n")
 
 	var grid []uint64
+	dimSq := dimension * dimension
 	for x := 0; x < dimension; x++ {
 		// Read a line into the grid, parsing it to ints.
 		line, err := buf.ReadString('\n')
@@ -33,20 +37,25 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 		}
 		line = strings.Trim(line, "\n")
 
-		if len(line) != dimension {
-			return nil, fmt.Errorf("Line for case %q has %d elements, not %d", name, len(line), dimension)
+		if len(line) != dimSq {
+			return nil, fmt.Errorf("Line for case %q has %d elements, not %d", name, len(line), dimSq)
 		}
 
-		for _, c := range line {
-			i, err := strconv.ParseUint(fmt.Sprint(c), 36, 64)
+		var c rune
+		for _, c = range line {
+			// https://blog.golang.org/strings :
+			// "A for range loop, by contrast, decodes one UTF-8-encoded rune on each iteration."
+			// And yet, the default formatter for rune appears to be the codepoint's number. Huh?
+			// Print the rune back out as a string; and then parse it as a Uint in base-36.
+			s := fmt.Sprintf("%c", c)
+			i, err := strconv.ParseUint(s, 36, 64)
 
 			if err != nil {
 				return nil, err
 			}
 
-			n := uint64(dimension)
-			if i > n*n {
-				return nil, fmt.Errorf("Value %d is outside of the limits of dimension %d", i, dimension)
+			if i > uint64(dimSq) {
+				return nil, fmt.Errorf("Value %d (%q) is outside of the limits of dimension %d", i, s, dimension)
 			}
 
 			grid = append(grid, i)
