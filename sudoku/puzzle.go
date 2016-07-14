@@ -28,7 +28,7 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 
 	var grid []uint64
 	dimSq := dimension * dimension
-	for x := 0; x < dimension; x++ {
+	for x := 0; x < dimSq; x++ {
 		// Read a line into the grid, parsing it to ints.
 		line, err := buf.ReadString('\n')
 		if err != nil && err != io.EOF {
@@ -38,7 +38,7 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 		line = strings.Trim(line, "\n")
 
 		if len(line) != dimSq {
-			return nil, fmt.Errorf("Line for case %q has %d elements, not %d", name, len(line), dimSq)
+			return nil, fmt.Errorf("Line %q for case %q has %d elements, not %d", line, name, len(line), dimSq)
 		}
 
 		var c rune
