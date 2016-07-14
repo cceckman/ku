@@ -36,6 +36,7 @@ const (
 )
 
 func TestPuzzleCollection(t *testing.T) {
+	// TODO test invalid collections, e.g. 2 of the same name
 	prefixReader := strings.NewReader(tradPrefix)
 	firstReader := strings.NewReader(firstCase)
 	secondReader := strings.NewReader(secondCase)

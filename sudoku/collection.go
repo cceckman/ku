@@ -14,7 +14,7 @@ const (
 )
 
 type PuzzleCollection struct {
-	puzzles   map[string]*Puzzle
+	puzzles   []*Puzzle
 	dimension int
 }
 
@@ -47,8 +47,8 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 		return nil, err
 	}
 
-	results := make(map[string]*Puzzle)
-
+	result := &PuzzleCollection{dimension: dimension}
+	names := make(map[string]bool)
 	for i := 0; i < count; i++ {
 		// Pass in the already-buffered reader, as it may have already forwarded the read pointer in 'r'
 		// past where we're interestd in.
@@ -57,16 +57,14 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 			return nil, err
 		}
 
-		if _, ok := results[puzzle.name]; ok {
+		if _, ok := names[puzzle.name]; ok {
 			return nil, fmt.Errorf("Duplicate puzzle name %s", puzzle.name)
 		}
-		results[puzzle.name] = puzzle
+		result.puzzles = append(result.puzzles, puzzle)
+		names[puzzle.name] = true
 	}
 
-	return &PuzzleCollection{
-		puzzles:   results,
-		dimension: dimension,
-	}, nil
+	return result, nil
 }
 
 func (p *PuzzleCollection) Print(w io.Writer) {
