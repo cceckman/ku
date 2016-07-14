@@ -49,7 +49,7 @@ func main() {
 }
 
 // Load from file. Don't bother doing it in the background yet.
-func read(name string) (*puzzle.PuzzleCollection, error) {
+func read(name string) (*puzzle.Collection, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err

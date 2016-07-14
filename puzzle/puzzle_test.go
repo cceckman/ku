@@ -35,7 +35,7 @@ const (
 	// TODO add >3x3 case
 )
 
-func TestPuzzleCollection(t *testing.T) {
+func TestCollection(t *testing.T) {
 	// TODO test invalid collections, e.g. 2 of the same name
 	prefixReader := strings.NewReader(tradPrefix)
 	firstReader := strings.NewReader(firstCase)
@@ -47,7 +47,7 @@ func TestPuzzleCollection(t *testing.T) {
 
 	collection, err := NewCollection(r)
 	if err != nil {
-		t.Fatalf("couldn't create PuzzleCollection: %v", err)
+		t.Fatalf("couldn't create Collection: %v", err)
 	}
 
 	// Test "print"; should match the input read.

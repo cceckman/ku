@@ -13,13 +13,13 @@ const (
 	base   = maxdim * maxdim
 )
 
-type PuzzleCollection struct {
+type Collection struct {
 	puzzles []*Puzzle
 	Size    int
 }
 
 // Read per the input format.
-func NewCollection(r io.Reader) (*PuzzleCollection, error) {
+func NewCollection(r io.Reader) (*Collection, error) {
 	buf := bufio.NewReader(r)
 
 	// Scan for two ints: the size, and the number of test cases.
@@ -47,7 +47,7 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 		return nil, err
 	}
 
-	result := &PuzzleCollection{Size: size}
+	result := &Collection{Size: size}
 	names := make(map[string]bool)
 	for i := 0; i < count; i++ {
 		// Pass in the already-buffered reader, as it may have already forwarded the read pointer in 'r'
@@ -67,7 +67,7 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 	return result, nil
 }
 
-func (p *PuzzleCollection) Print(w io.Writer) {
+func (p *Collection) Print(w io.Writer) {
 	fmt.Fprintf(w, "%d %d\n", p.Size, len(p.puzzles))
 	for _, puzzle := range p.puzzles {
 		puzzle.Print(w)
