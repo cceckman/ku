@@ -8,6 +8,9 @@ import (
 	"github.com/cceckman/ku/puzzle"
 )
 
+// badFile is like goodFile, with the following edits:
+// Case 1: r0 c0 b0 is 0, not 8
+// Case 2: r2 c4 b1 is 6, not 2 
 const (
 	goodFile = "testdata/suite-a.good.txt"
 	badFile  = "testdata/suite-a.bad-1.txt"
@@ -24,7 +27,10 @@ func TestIsSolved(t *testing.T) {
 	// so... tag for followup in the devlog.
 	cases := map[string]expectedIssues{
 		os.Getenv("PWD") + string(os.PathSeparator) + goodFile: make(expectedIssues),
-		os.Getenv("PWD") + string(os.PathSeparator) + badFile:  make(expectedIssues),
+		os.Getenv("PWD") + string(os.PathSeparator) + badFile:  expectedIssues{
+			"Case 1": true,
+			"Case 2": true,	
+		},
 	}
 
 	for k, v := range cases {
@@ -45,9 +51,11 @@ func testIsSolved(t *testing.T, path string, issuesFor expectedIssues) {
 		t.Fatalf("could not load puzzle collection: %v", err)
 	}
 
+	t.Logf("Testing file %v\n", path)
 	for _, puzzle := range collection.Puzzles {
 		// Use the comma ok idiom to gather "expect it to be solved." if there are no expected issues
-		_, expectSolved := issuesFor[puzzle.Name]
+		_, expectIssues := issuesFor[puzzle.Name]
+		expectSolved := ! expectIssues
 
 		solved, issues := IsSolved(puzzle)
 		if solved != expectSolved {
