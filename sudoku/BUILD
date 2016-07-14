@@ -6,12 +6,28 @@ package(
 
 go_library(
     name = "go_default_library",
-    srcs = ["puzzle.go", "collection.go"],
+    srcs = [
+        "collection.go",
+        "puzzle.go",
+    ],
 )
 
 go_test(
     name = "puzzle_test",
-    srcs = ["puzzle_test.go"],
-    library = ":go_default_library",
     size = "small",
-    )
+    srcs = [
+        "puzzle_test.go",
+        "testdata.go",
+    ],
+    library = ":go_default_library",
+)
+
+go_test(
+    name = "collection_test",
+    size = "small",
+    srcs = [
+        "collection_test.go",
+        "testdata.go",
+    ],
+    library = ":go_default_library",
+)

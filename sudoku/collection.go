@@ -70,7 +70,7 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 }
 
 func (p *PuzzleCollection) Print(w io.Writer) {
-	fmt.Printf("%d %d\n", p.dimension, len(p.puzzles))
+	fmt.Fprintf(w, "%d %d\n", p.dimension, len(p.puzzles))
 	for _, puzzle := range p.puzzles {
 		puzzle.Print(w)
 	}
