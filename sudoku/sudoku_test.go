@@ -7,6 +7,59 @@ import (
 	"testing"
 )
 
+const (
+	tradPrefix = "3 2\n"
+	firstCase = `Case 1
+000000001
+603091005
+079040080
+050074000
+000002006
+000030000
+504060090
+006008004
+300000700
+`
+	secondCase = `Case 4
+198734265
+564192378
+273865914
+315427689
+849356721
+627918543
+736541892
+452689137
+981273456`
+	firstName = "Case 1"
+	secondName = "Case 4"
+	// TODO add >3x3 case
+)
+
+func TestPuzzleCollection(t *testing.T) {
+	prefixReader := strings.NewReader(tradPrefix)
+	firstReader := strings.NewReader(firstCase)
+	secondReader := strings.NewReader(secondCase)
+	catReader := io.MultiReader(prefixReader, firstReader, secondReader)
+
+	expectedOutput := new(bytes.Buffer)
+	r := io.TeeReader(catReader, expectedOutput)
+
+	collection, err := NewCollection(r)
+	if err != nil {
+		t.Fatalf("couldn't create PuzzleCollection: %v", err)
+	}
+
+	// Test "print"; should match the input read.
+	output := new(bytes.Buffer)
+	collection.Print(output)
+
+	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
+	expectedOutput.WriteString("\n")
+	if output.String() != expectedOutput.String() {
+		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, expectedOutput.String())
+	}
+}
+
 func TestSinglePuzzle(t *testing.T) {
 	firstReader := strings.NewReader(firstCase)
 	p, err := NewPuzzle(3, firstReader)

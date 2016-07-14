@@ -13,21 +13,11 @@ go_library(
 )
 
 go_test(
-    name = "puzzle_test",
+    name = "sudoku_test",
     size = "small",
     srcs = [
-        "puzzle_test.go",
-        "testdata.go",
+        "sudoku_test.go",
     ],
     library = ":go_default_library",
 )
 
-go_test(
-    name = "collection_test",
-    size = "small",
-    srcs = [
-        "collection_test.go",
-        "testdata.go",
-    ],
-    library = ":go_default_library",
-)
