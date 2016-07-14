@@ -48,7 +48,7 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 			// And yet, the default formatter for rune appears to be the codepoint's number. Huh?
 			// Print the rune back out as a string; and then parse it as a Uint in base-36.
 			s := fmt.Sprintf("%c", c)
-			i, err := strconv.ParseUint(s, 36, 64)
+			i, err := strconv.ParseUint(s, base, 64)
 
 			if err != nil {
 				return nil, err
@@ -73,10 +73,13 @@ func NewPuzzle(dimension int, r io.Reader) (*Puzzle, error) {
 func (p *Puzzle) Print(w io.Writer) {
 	fmt.Fprintf(w, "%s\n", p.name)
 	// Lines
-	for i := 0; i < p.dimension; i++ {
+	dimSq := p.dimension * p.dimension
+	for i := 0; i < dimSq; i++ {
 		// Columns
-		for j := 0; j < p.dimension; j++ {
-			fmt.Fprintf(w, "%c", p.grid[i*p.dimension+j])
+		for j := 0; j < dimSq; j++ {
+			v := p.grid[i * dimSq + j]
+			s := strconv.FormatUint(v, base)
+			fmt.Fprint(w, s)
 		}
 		fmt.Fprintln(w, "")
 	}

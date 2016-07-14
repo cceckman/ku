@@ -10,6 +10,7 @@ import (
 
 const (
 	maxDim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle.
+	base = maxDim * maxDim
 )
 
 type PuzzleCollection struct {
