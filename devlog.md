@@ -45,3 +45,30 @@ I wrote up an ICPC-like definition in the README. Now to write up a verifier-
 ## 2016-07-12 Tue 22:00
 I'll treat the validator as its own binary- `verify`- with inputs in files
 rather than ICPC's stdin / stdout convention. Easy enough to framework that up.
+
+## 2016-07-13 Wed 19:37
+Back at the wheel. Grr; OS X has a `screen` without vertical splits. Need to go
+get the brew version. Whatever.
+
+Okay, I have loading; time to make some testdata and tests for the verifier.
+(Testing of testing of testing...) But that also tests load / print, which is
+good.
+
+Hrm, Euler doesn't provide solutions. (I should do more of those, though.) That
+[first link](http://menneske.no/sudoku/eng/) does give solutions, and problems,
+in HTML; good enough for a few cases, since we want to have a few that are
+invalid as well.
+
+## 2016-07-13 Wed 19:46
+I realized on the way home that "dimension" is the wrong term for these puzzles-
+it's really "size", and the "dimension" is 2. A traditional Su Doku is size 3,
+dimension 2; so, numbers 1 to 3^2, with 3^2 boxes, 3^2 in each row / column,
+etc. By contrast, a Su Doku of size 2 and dimension 3 would have 2^3 = 8 rows,
+columns, and slices (the third dimension), and be subdivided into 2-by-2-by-2
+cubes. (It would have 4-by-4-by-4 of these, as a consequence.)
+
+Okay; yeah, the Menneske site works. Copy and paste through `s/\(.\) /\1/g` and
+it works fine. Well, okay, a little more:
+```
+pbpaste | tr ' ' '0' | sed 's/[[:space:]]//g'
+```
