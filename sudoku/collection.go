@@ -9,32 +9,32 @@ import (
 )
 
 const (
-	maxDim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle.
-	base = maxDim * maxDim
+	maxdim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle.
+	base   = maxdim * maxdim
 )
 
 type PuzzleCollection struct {
-	puzzles   []*Puzzle
-	dimension int
+	puzzles []*Puzzle
+	Size    int
 }
 
 // Read per the input format.
 func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 	buf := bufio.NewReader(r)
 
-	// Scan for two ints: the dimension, and the number of test cases.
+	// Scan for two ints: the size, and the number of test cases.
 	dimStr, err := buf.ReadString(' ')
 	if err != nil {
 		return nil, err
 	}
 
-	dimension, err := strconv.Atoi(strings.Trim(dimStr, " "))
+	size, err := strconv.Atoi(strings.Trim(dimStr, " "))
 	if err != nil {
 		return nil, err
 	}
 
-	if dimension > maxDim {
-		return nil, fmt.Errorf("Dimension %d of input exceeds maximum dimension %d", dimension, maxDim)
+	if size > maxdim {
+		return nil, fmt.Errorf("dimension %d of input exceeds maximum size %d", size, maxdim)
 	}
 
 	countStr, err := buf.ReadString('\n')
@@ -47,12 +47,12 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 		return nil, err
 	}
 
-	result := &PuzzleCollection{dimension: dimension}
+	result := &PuzzleCollection{Size: size}
 	names := make(map[string]bool)
 	for i := 0; i < count; i++ {
 		// Pass in the already-buffered reader, as it may have already forwarded the read pointer in 'r'
 		// past where we're interestd in.
-		puzzle, err := NewPuzzle(dimension, buf)
+		puzzle, err := NewPuzzle(size, buf)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +68,7 @@ func NewCollection(r io.Reader) (*PuzzleCollection, error) {
 }
 
 func (p *PuzzleCollection) Print(w io.Writer) {
-	fmt.Fprintf(w, "%d %d\n", p.dimension, len(p.puzzles))
+	fmt.Fprintf(w, "%d %d\n", p.Size, len(p.puzzles))
 	for _, puzzle := range p.puzzles {
 		puzzle.Print(w)
 	}

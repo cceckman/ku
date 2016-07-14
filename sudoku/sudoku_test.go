@@ -9,7 +9,7 @@ import (
 
 const (
 	tradPrefix = "3 2\n"
-	firstCase = `Case 1
+	firstCase  = `Case 1
 000000001
 603091005
 079040080
@@ -30,7 +30,7 @@ const (
 736541892
 452689137
 981273456`
-	firstName = "Case 1"
+	firstName  = "Case 1"
 	secondName = "Case 4"
 	// TODO add >3x3 case
 )

@@ -46,12 +46,6 @@ func main() {
 
 	fmt.Printf("Inputs and outputs ready! \n")
 
-	fmt.Printf("Input:\n")
-	in.Print(os.Stdout)
-
-
-	fmt.Printf("Output:\n")
-	out.Print(os.Stdout)
 }
 
 // Load from file. Don't bother doing it in the background yet.

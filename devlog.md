@@ -87,3 +87,29 @@ write different concerete types that implement the same interface?
 Wait, I said I wasn't doing optimzation yet. :-P So, sure, let's get a verifier
 and solver first. (But, yeah, a few different build targets sounds like a not
 horrible idea for *this*, even if it's not great generally.)
+
+## 2016-07-14 Thu 11:54
+Ran into one of those nice Go features: nondeterministic map iteration.
+(Fixed the test with a9282e0.)
+
+I actually really like this feature! It pointed out that I had a
+nondeterministic test... well, it did after I ran the test a couple times.
+
+On its applicability here in particular: in README.md, I've said that the
+outputs need to have the same labels, but don't have to be in the same order.
+Loosening this may be a bit of a premature optimization, in and of itself. The
+situation I see that helping is if both of these conditions are true:
+
+1. Some puzzles take much longer than others, and
+2. The process is bounded on IO time
+
+If (1) isn't true, then order doesn't matter- we wind up serializing anyway, and
+that's the bounding factor. If (2) isn't true, then the fact that we're
+serializing doesn't matter.
+
+I think that we can make (2) not true by using `testing.Benchmark` as the core
+of the performance measurement. Still writing ICPC-style `solve` and `verify`
+binaries to start out with, but ultimately keeping more things in memory and
+unmarshalled- not timing the IO- is going to be a better indication of the
+things I'm interested in: - the impact of parallelism, function calls,
+virtual functions, etc.
