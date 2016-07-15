@@ -22,4 +22,5 @@ go_test(
     deps = [
         "//puzzle:go_default_library",
     ],
+    size = "small",
 )
