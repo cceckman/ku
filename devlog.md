@@ -123,3 +123,78 @@ explicitly add in the evaluated "PWD".
 
 Something something $RUNFILES... but there isn't a GO_RUNFILES or RUNFILES in
 the environment. Bleh.
+
+## 2016-07-15 Fri 14:49
+Yay! Actually have it working- or so it seems.
+
+It's a bit surprising to me that this is as fast as it is- still a fraction of a
+second, even though in this first iteration we're completely single-threaded,
+brute-force, and not even using the most efficient data structures. Clearly, I
+need to scale up the number of puzzles.
+
+This suggests that parallelism may not be a limiting factor- it doesn't take
+very long to explore a solution space. Maybe time to start making a list of
+variables / optimizations to test against:
+
+- Tail recursion / loopifying- how much overhead does a function call add? (This
+  is Go, so probably not much.)
+- Parallelism: if we can explore multiple branches at the same time, can we
+  speed things up?
+  - Test the Go scheduler: do we get win / loss by 
+  - Note that this is DFS; parallelism may actually slow things down, because
+    ~ all of the non-solution threads will be stealing CPU time from the one
+    that will eventually succeed. This is kind of the case with non-parallel
+    search too- you have to explore & discard a bunch of duds before getting to
+    the right one- so not sure what'll be better.
+  - Are there any limits to parallelism that would actuallly help? e.g. barriers
+    at a recursion layer? We're only CPU-bounded, not IO bounded, in this
+    evaluation, so every thread *can* run to completion without waiting on
+    anything else. Another potential limit would be how deeply we do branching-
+    e.g. when you just have X empty cells / are Y levels deep / have Z other
+    threads running, do your own evaluation serially.
+- Heuristic guessing: Evaluate the cells with fewest possibilities first.
+  - Are there any cases in which guessing-and-invalidating may be faster than
+    running through the logic? That may be a hard question to answer.
+  This is probably, actually, a huge improvement that I want to measure.
+- Algorithmic improvement to "pure logic" section? (see below)
+  - Can we parallelize the evaluation of "what must a cell be"? Yes, I think so;
+    is the win worth the cost of thread creation, for that tiny loop?
+  - Can we have a more clever serial algorithm, e.g. one based on invalidation
+    when something is marked, rather than on marking something, and then looping
+    over all the cells *again*? There's something to do with a queue here, e.g.:
+    whenever you assign a cell, enqueue all the unknowns in its row / col / box,
+    and then the row, col, and box itself. Dequeueing a cell, or dequeueing a
+    row / col / box, means doing the 
+- Make the problem more difficult
+  - Add the ability / option to verify that the solution is unique?
+
+"Pure logic", above- there's two stages to solving a Sudoku.
+1. You do some logic, repeatedly:
+  1. figuring out whether the other cells in a zone (row / col / box) constrain a
+     cell down to one number, 
+  2. figure out whether there's only one cell that can be filled by a certain number.
+2. If that has stopped making progress, start a new puzzle where one now-empty
+   cell is filled in (in a valid way); if that puzzle has a solution (possibly
+    after more guesses), then you have a solution with what you filled in.
+
+(2) is most easily parallelized, becase you're evaluating separate puzzles along
+different trees of guesses. But we can probably parallelize (1) as well, to some
+degree... which may or may not be beneficial.
+
+[This site](http://krazydata.com/hexsudoku) looks like it'll be useful for
+sourcing a size-4 Sudoku- that is, 16x16 (hence "hex"). There's some degree of
+non-linear scaling with size... not sure what the appropriate function is.
+Maybe n^4, for row, col, box, and value? Let's see...
+
+The number of rows, cols, boxes, and values are all N^2 for a size-N (square)
+Sudoku; the number of cells is (row * col). The branching factor for guessing is
+cells * values- you have to fill each empty cell with each of its possible
+values. The logic section generally invovles comparisons of cell * row * col *
+box... but that's a little deceptive, because some caching of possibilities,
+loop optimzation, and early exiting could make it less.
+
+In any case: I expect that adding more test cases will magnify the differences
+in performance between various strategies, but that these puzzles may be too
+small to see any substantial difference anyway. But on larger puzzles, it'll
+come out more. Let's see- we can go up to size 5, right? Or if we change the
+input format, arbitrarily large...
