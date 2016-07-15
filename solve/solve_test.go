@@ -1,6 +1,7 @@
 package solve
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 
@@ -29,9 +30,16 @@ func TestSolve(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error instantiating test case: %v", err)
 	}
-	Solve(p)
+	if err := Solve(p); err != nil {
+		t.Fatalf("Error from solver: %v", err)
+	}
 
 	if solved, issues := verify.IsSolved(p); solved {
 		t.Errorf("Puzzle %s isn't solved: \n%s\n", p.Name, strings.Join(issues, "\n\t"))
 	}
+
+	out := bytes.NewBuffer(make([]byte,0))
+	p.Print(out)
+	t.Errorf("Solution:\n")
+	t.Errorf(out.String())
 }
