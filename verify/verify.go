@@ -33,7 +33,12 @@ func IsSolved(p *puzzle.Puzzle) (bool, []string) {
 // e.g. have exactly the necessary values.
 func complete(p *puzzle.Puzzle, idx []int) []string {
 	// Maps int to where it's found.
-	mask := make([]int, p.Size*p.Size+1) // +1 because 0 *should* not be found.
+	mask := make([]int, p.Size*p.Size+1) // Indexed range one to maximum.
+	for i := range mask {
+		mask[i] = -1 // 0 is a valid cell index! So, preset to something that isn't a valid index.
+		// Panic! At The Index, if it's actually used as an index. Which of course it shouldn't be,
+		// but didd the first time I ran this, because I hadn't updated the "is this index already seen" line.
+	}
 
 	var issues []string
 
@@ -43,7 +48,7 @@ func complete(p *puzzle.Puzzle, idx []int) []string {
 			issues = append(issues,
 				fmt.Sprintf("puzzle not solved: index %d isn't set (%s)", i, p.CellInfo(i)))
 		}
-		if mask[v] != 0 {
+		if mask[v] != -1 {
 			issues = append(issues,
 				fmt.Sprintf("value %d found at two indices: (%s) (%s)", v, p.CellInfo(i), p.CellInfo(mask[v])))
 		}
@@ -53,7 +58,7 @@ func complete(p *puzzle.Puzzle, idx []int) []string {
 
 	// The "no duplicates, no zeros" should check this, but let's make sure...
 	for v := 1; v < len(mask); v++ {
-		if mask[v] == 0 {
+		if mask[v] == -1 {
 			issues = append(issues, fmt.Sprintf("value %d not found", v))
 		}
 	}
