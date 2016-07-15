@@ -167,6 +167,15 @@ func (p *Puzzle) Box(box int) []int {
 	return r
 }
 
+// Get all the values at the given indices.
+func (p *Puzzle) Values(idx []int) []uint64 {
+	results := make([]uint64, len(idx))
+	for i, n := range idx {
+		results[i] = p.Value[n]
+	}
+	return results
+}
+
 // Utility: pretty-print an index, for debugging.
 func (p *Puzzle) CellInfo(idx int) string {
 	return fmt.Sprintf("idx: %d value: %d r: %d c: %d b: %d",
