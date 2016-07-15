@@ -176,6 +176,19 @@ func (p *Puzzle) Values(idx []int) []uint64 {
 	return results
 }
 
+// Create a new copy of the puzzle.
+func (p *Puzzle) Copy() *Puzzle {
+	newp := &Puzzle{
+		Name: p.Name,
+		Size: p.Size,
+		Value: make([]uint64, len(p.Value)),
+	}
+	for i := range p.Value {
+		newp.Value[i] = p.Value[i]
+	}
+	return newp
+}
+
 // Utility: pretty-print an index, for debugging.
 func (p *Puzzle) CellInfo(idx int) string {
 	return fmt.Sprintf("idx: %d value: %d r: %d c: %d b: %d",

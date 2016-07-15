@@ -40,6 +40,6 @@ func TestSolve(t *testing.T) {
 
 	out := bytes.NewBuffer(make([]byte,0))
 	p.Print(out)
-	t.Errorf("Solution:\n")
-	t.Errorf(out.String())
+	t.Logf("Solution:\n")
+	t.Logf(out.String())
 }
