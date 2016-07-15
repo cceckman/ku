@@ -89,49 +89,49 @@ func TestSinglePuzzle(t *testing.T) {
 		}
 	}
 	// Spot-check Row:
-	for idx, row := range map[int][]int{
-		0: []int{0, 0, 0, 0, 0, 0, 0, 0, 1,},
-		6: []int{5, 0, 4, 0, 6, 0, 0, 9, 0,},
-		8: []int{3, 0, 0, 0, 0, 0, 7, 0, 0,},
+	for idx, row := range map[int][]uint64{
+		0: []uint64{0, 0, 0, 0, 0, 0, 0, 0, 1,},
+		6: []uint64{5, 0, 4, 0, 6, 0, 0, 9, 0,},
+		8: []uint64{3, 0, 0, 0, 0, 0, 7, 0, 0,},
 	} {
 		gotRow := p.Row(idx)
 		if len(gotRow) != len(row) {
 			t.Errorf("Row %d test failed: got: %v expected: %v", idx, gotRow, row)
 		}
 		for i := range row {
-			if gotRow[i] != row[i] {
-				t.Errorf("Row %d test failed: got: %v expected: %v", idx, gotRow, row)
+			if p.Value[gotRow[i]] != row[i] {
+				t.Errorf("Row %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotRow[i]), row[i])
 			}
 		}
 	}
 	// Spot-check Col:
-	for idx, col := range map[int][]int{
-		0: []int{0, 6, 0, 0, 0, 0, 5, 0, 3,},
-		4: []int{0, 9, 4, 7, 0, 3, 6, 0, 0,},
+	for idx, col := range map[int][]uint64{
+		0: []uint64{0, 6, 0, 0, 0, 0, 5, 0, 3,},
+		4: []uint64{0, 9, 4, 7, 0, 3, 6, 0, 0,},
 	} {
 		gotCol := p.Col(idx)
 		if len(gotCol) != len(col) {
 			t.Errorf("Col %d test failed: got: %v expected: %v", idx, gotCol, col)
 		}
 		for i := range col {
-			if gotCol[i] != col[i] {
-				t.Errorf("Col %d test failed: got: %v expected: %v", idx, gotCol, col)
+			if p.Value[gotCol[i]] != col[i] {
+				t.Errorf("Col %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotCol[i]), col[i])
 			}
 		}
 	}
 	// Spot-check Box:
-	for idx, box := range map[int][]int{
-		0: []int{0, 0, 0, 6, 0, 3, 0, 7, 9,},
-		4: []int{0, 5, 0, 0, 0, 0, 0, 0, 0,},
-		8: []int{0, 9, 0, 0, 0, 4, 7, 0, 0,},
+	for idx, box := range map[int][]uint64{
+		0: []uint64{0, 0, 0, 6, 0, 3, 0, 7, 9,},
+		3: []uint64{0, 5, 0, 0, 0, 0, 0, 0, 0,},
+		8: []uint64{0, 9, 0, 0, 0, 4, 7, 0, 0,},
 	} {
 		gotBox := p.Box(idx)
 		if len(gotBox) != len(box) {
 			t.Errorf("Box %d test failed: got: %v expected: %v", idx, gotBox, box)
 		}
 		for i := range box {
-			if gotBox[i] != box[i] {
-				t.Errorf("Box %d test failed: got: %v expected: %v", idx, gotBox, box)
+			if p.Value[gotBox[i]] != box[i] {
+				t.Errorf("Box %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotBox[i]), box[i])
 			}
 		}
 	}
