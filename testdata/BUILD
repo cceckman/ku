@@ -3,6 +3,7 @@ package(
 )
 
 filegroup(
-    name = "suite-a",
-    srcs = glob(["suite-a.*"]),
+    name = "testdata",
+    srcs = glob(["*.txt"]),
 )
+

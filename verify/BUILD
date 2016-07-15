@@ -21,7 +21,7 @@ go_test(
     size = "small",
     srcs = ["verify_test.go"],
     data = [
-        "//testdata:suite-a",
+        "//testdata:testdata",
     ],
     library = ":go_default_library",
     deps = [

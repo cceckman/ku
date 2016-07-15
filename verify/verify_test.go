@@ -8,30 +8,32 @@ import (
 	"github.com/cceckman/ku/puzzle"
 )
 
-// badFile is like goodFile, with the following edits:
-// Case 1: r0 c0 b0 is 0, not 8
-// Case 2: r2 c4 b1 is 6, not 2
-const (
-	goodFile = "testdata/suite-a.good.txt"
-	badFile  = "testdata/suite-a.bad-1.txt"
-)
+
 
 // Case names where we expect issues.
 // TODO as an enhancement to the tests: make it map to []string,
 // prefixes of issues that we expect.
 type expectedIssues map[string]bool
 
+func getPath(in string) string {
+	return os.Getenv("PWD") + string(os.PathSeparator) + in
+}
+
 func TestIsSolved(t *testing.T) {
 	// TODO: Figure out WTH is going on here. Why doesn't a path implicitly relative to the working
 	// directory work? Unfortunately, I'm on a plane and don't have access to the Bazel documentation,
 	// so... tag for followup in the devlog.
 	cases := map[string]expectedIssues{
-		os.Getenv("PWD") + string(os.PathSeparator) + goodFile: make(expectedIssues),
-		os.Getenv("PWD") + string(os.PathSeparator) + badFile: expectedIssues{
+		getPath("testdata/suite-a.good.txt"): make(expectedIssues),
+		// Case 1: r0 c0 b0 is 0, not 8
+		// Case 2: r2 c4 b1 is 6, not 2
+		// Case 6: many zeros (partially solved)
+		getPath("testdata/suite-a.bad-1.txt"): expectedIssues{
 			"Case 1": true,
 			"Case 2": true,
 			"Case 6": true,
 		},
+		getPath("testdata/suite-b.good.txt"): make(expectedIssues),
 	}
 
 	for k, v := range cases {
