@@ -21,12 +21,39 @@ const (
 530000018
 006040300
 `
+
+	caseTwo = `Case 2
+1324
+2413
+4231
+3142`
 )
 
 func TestSolve(t *testing.T) {
 	r := strings.NewReader(caseOne)
 
 	p, err := puzzle.NewPuzzle(3, r)
+	if err != nil {
+		t.Fatalf("Error instantiating test case: %v", err)
+	}
+	if err := Solve(p); err != nil {
+		t.Fatalf("Error from solver: %v", err)
+	}
+
+	if solved, issues := verify.IsSolved(p); !solved {
+		t.Errorf("Puzzle %s isn't solved: \n%s\n", p.Name, strings.Join(issues, "\n\t"))
+	}
+
+	out := bytes.NewBuffer(make([]byte,0))
+	p.Print(out)
+	t.Logf("Solution:\n")
+	t.Logf(out.String())
+}
+
+func TestSolveTwo(t *testing.T) {
+	r := strings.NewReader(caseTwo)
+
+	p, err := puzzle.NewPuzzle(2, r)
 	if err != nil {
 		t.Fatalf("Error instantiating test case: %v", err)
 	}
