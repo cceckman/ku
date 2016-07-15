@@ -10,7 +10,7 @@ import (
 
 // badFile is like goodFile, with the following edits:
 // Case 1: r0 c0 b0 is 0, not 8
-// Case 2: r2 c4 b1 is 6, not 2 
+// Case 2: r2 c4 b1 is 6, not 2
 const (
 	goodFile = "testdata/suite-a.good.txt"
 	badFile  = "testdata/suite-a.bad-1.txt"
@@ -27,9 +27,9 @@ func TestIsSolved(t *testing.T) {
 	// so... tag for followup in the devlog.
 	cases := map[string]expectedIssues{
 		os.Getenv("PWD") + string(os.PathSeparator) + goodFile: make(expectedIssues),
-		os.Getenv("PWD") + string(os.PathSeparator) + badFile:  expectedIssues{
+		os.Getenv("PWD") + string(os.PathSeparator) + badFile: expectedIssues{
 			"Case 1": true,
-			"Case 2": true,	
+			"Case 2": true,
 		},
 	}
 
@@ -55,7 +55,7 @@ func testIsSolved(t *testing.T, path string, issuesFor expectedIssues) {
 	for _, puzzle := range collection.Puzzles {
 		// Use the comma ok idiom to gather "expect it to be solved." if there are no expected issues
 		_, expectIssues := issuesFor[puzzle.Name]
-		expectSolved := ! expectIssues
+		expectSolved := !expectIssues
 
 		solved, issues := IsSolved(puzzle)
 		if solved != expectSolved {

@@ -9,8 +9,8 @@ import (
 )
 
 type Puzzle struct {
-	Name string
-	Size int
+	Name  string
+	Size  int
 	Value []uint64 // a Size-by-Size grid in row-major order.
 }
 
@@ -63,8 +63,8 @@ func NewPuzzle(size int, r io.Reader) (*Puzzle, error) {
 	}
 
 	return &Puzzle{
-		Name: name,
-		Size: size,
+		Name:  name,
+		Size:  size,
 		Value: grid,
 	}, nil
 }

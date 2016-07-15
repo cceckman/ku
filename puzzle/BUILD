@@ -20,4 +20,3 @@ go_test(
     ],
     library = ":go_default_library",
 )
-

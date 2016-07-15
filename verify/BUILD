@@ -14,6 +14,7 @@ go_library(
 
 go_test(
     name = "verify_test",
+    size = "small",
     srcs = ["verify_test.go"],
     data = [
         "//testdata:suite-a",
@@ -22,5 +23,4 @@ go_test(
     deps = [
         "//puzzle:go_default_library",
     ],
-    size = "small",
 )
