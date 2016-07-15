@@ -198,3 +198,7 @@ in performance between various strategies, but that these puzzles may be too
 small to see any substantial difference anyway. But on larger puzzles, it'll
 come out more. Let's see- we can go up to size 5, right? Or if we change the
 input format, arbitrarily large...
+
+## 2016-07-15 Fri 15:32
+So, the next step is to gather a bunch of test cases, and create a benchmark
+test.
