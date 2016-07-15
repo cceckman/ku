@@ -30,6 +30,7 @@ func TestIsSolved(t *testing.T) {
 		os.Getenv("PWD") + string(os.PathSeparator) + badFile: expectedIssues{
 			"Case 1": true,
 			"Case 2": true,
+			"Case 6": true,
 		},
 	}
 
@@ -55,11 +56,10 @@ func testIsSolved(t *testing.T, path string, issuesFor expectedIssues) {
 	for _, puzzle := range collection.Puzzles {
 		// Use the comma ok idiom to gather "expect it to be solved." if there are no expected issues
 		_, expectIssues := issuesFor[puzzle.Name]
-		expectSolved := !expectIssues
 
 		solved, issues := IsSolved(puzzle)
-		if solved != expectSolved {
-			t.Errorf("puzzle %q had unexpected solution state: got: %v expected: %v", puzzle.Name, solved, expectSolved)
+		if solved == expectIssues {
+			t.Errorf("puzzle %q had unexpected solution state: got: %v expected: %v", puzzle.Name, solved, !expectIssues)
 			if len(issues) != 0 {
 				t.Errorf("got issues:\n%v", strings.Join(issues, "\n"))
 			}

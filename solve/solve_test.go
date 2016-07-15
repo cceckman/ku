@@ -34,7 +34,7 @@ func TestSolve(t *testing.T) {
 		t.Fatalf("Error from solver: %v", err)
 	}
 
-	if solved, issues := verify.IsSolved(p); solved {
+	if solved, issues := verify.IsSolved(p); !solved {
 		t.Errorf("Puzzle %s isn't solved: \n%s\n", p.Name, strings.Join(issues, "\n\t"))
 	}
 
