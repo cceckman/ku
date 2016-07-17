@@ -35,6 +35,10 @@ func TestIsSolved(t *testing.T) {
 		},
 		getPath("testdata/suite-b.good.txt"): make(expectedIssues),
 		getPath("testdata/suite-c.good.txt"): make(expectedIssues),
+		// Case 1: r5 c1 b5 is A, not 4
+		getPath("testdata/suite-c.bad.txt"): expectedIssues{
+			"Case 1": true,
+		},
 	}
 
 	for k, v := range cases {
