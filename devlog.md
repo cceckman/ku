@@ -202,3 +202,24 @@ input format, arbitrarily large...
 ## 2016-07-15 Fri 15:32
 So, the next step is to gather a bunch of test cases, and create a benchmark
 test.
+
+## 2016-07-16 Sat 21:32
+An [online PDF to text converter](http://pdftotext.com/),
+[this page](http://www.sudoku-download.net/sudoku_16x16.php) of 16x16
+puzzles and solutions, and some gratiutious manipulation with `tr` and Vim's
+[substitution capability](http://vim.wikia.com/wiki/Making_a_list_of_numbers)
+have given me a reasonable set of solved puzzles for size = 4.
+
+`brew install poppler` was my first choice, but was not cooperating. The
+specific process was
+
+- `%s/ //g` to clean up the spaces in the text file
+- `g/[0-9]/d` to get rid of page numbers
+- manually shrink adjacent blank lines
+- `%!tr ABCDEFGHIJKLMNOP 123456789ABCDEFG` to map back from numbers to hex-ish
+  digits (G included, because 0 means "blank" in our spec)
+- `let i=1 | g/^$/s//\='Case '.i/ | let i=i+1` in Vim to add case numbers.
+- Manually add size (4) and count of cases (24) to the beginning.
+
+Unfortunately, the conversion of the unsolved puzzle lost the layout entirely.
+So will need to go back and manually-ish create those cases.
