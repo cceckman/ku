@@ -67,9 +67,19 @@ func NewCollection(r io.Reader) (*Collection, error) {
 	return result, nil
 }
 
-func (p *Collection) Print(w io.Writer) {
-	fmt.Fprintf(w, "%d %d\n", p.Size, len(p.Puzzles))
-	for _, puzzle := range p.Puzzles {
-		puzzle.Print(w)
+func (p *Collection) WriteTo(w io.Writer) (int64, error) {
+	var acc int64
+	sz, err := fmt.Fprintf(w, "%d %d\n", p.Size, len(p.Puzzles))
+	acc += int64(sz)
+	if err != nil {
+		return acc, err
 	}
+	for _, puzzle := range p.Puzzles {
+		sz, err := puzzle.WriteTo(w)
+		acc += int64(sz)
+		if err != nil {
+			return acc, err
+		}
+	}
+	return acc, nil
 }

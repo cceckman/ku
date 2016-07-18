@@ -14,6 +14,11 @@ type Puzzle struct {
 	Value []uint64 // a Size-by-Size grid in row-major order.
 }
 
+// Interface assertions. This appears to be the Go-ish way to assert "I implement an interface."
+var (
+	_ io.WriterTo = (*Puzzle)(nil)
+)
+
 // Load a single puzzle from the Reader.
 func NewPuzzle(size int, r io.Reader) (*Puzzle, error) {
 	buf := bufio.NewReader(r)
@@ -70,8 +75,13 @@ func NewPuzzle(size int, r io.Reader) (*Puzzle, error) {
 }
 
 // Prints a puzzle to the Writer.
-func (p *Puzzle) Print(w io.Writer) {
-	fmt.Fprintf(w, "%s\n", p.Name)
+func (p *Puzzle) WriteTo(w io.Writer) (int64, error) {
+	var acc int64
+	sz, err := fmt.Fprintf(w, "%s\n", p.Name)
+	acc += int64(sz)
+	if err != nil {
+		return acc, err
+	}
 	// Lines
 	dimSq := p.Size * p.Size
 	for i := 0; i < dimSq; i++ {
@@ -79,10 +89,19 @@ func (p *Puzzle) Print(w io.Writer) {
 		for j := 0; j < dimSq; j++ {
 			v := p.Value[i*dimSq+j]
 			s := strconv.FormatUint(v, base)
-			fmt.Fprint(w, s)
+			sz, err = fmt.Fprint(w, s)
+			acc += int64(sz)
+			if err != nil {
+				return acc, err
+			}
 		}
-		fmt.Fprintln(w, "")
+		sz, err := fmt.Fprintln(w, "")
+		acc += int64(sz)
+		if err != nil {
+			return acc, err
+		}
 	}
+	return acc, nil
 }
 
 // RowOf gives the row of the given cell.

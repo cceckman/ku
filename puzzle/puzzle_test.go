@@ -52,7 +52,7 @@ func TestCollection(t *testing.T) {
 
 	// Test "print"; should match the input read.
 	output := new(bytes.Buffer)
-	collection.Print(output)
+	collection.WriteTo(output)
 
 	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
 	expectedOutput.WriteString("\n")
@@ -136,9 +136,9 @@ func TestSinglePuzzle(t *testing.T) {
 		}
 	}
 
-	// Test "print"; should match input.
+	// Test "WriteTo"; should match input.
 	output := bytes.NewBuffer(make([]byte, 0, len(firstCase)))
-	p.Print(output)
+	p.WriteTo(output)
 
 	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
 	if output.String() != firstCase {
@@ -170,9 +170,9 @@ func TestTwoPuzzles(t *testing.T) {
 
 	// Test "print"; should match input.
 	output := bytes.NewBuffer(make([]byte, 0, len(secondCase)))
-	secondPuzzle.Print(output)
+	secondPuzzle.WriteTo(output)
 
-	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
+	// NB: WriteTo always terminates with a newline, but it doesn't care whether there's a trailing newline.
 	if output.String() != (secondCase + "\n") {
 		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, secondCase)
 	}

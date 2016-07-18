@@ -64,7 +64,7 @@ func TestSolve(t *testing.T) {
 	}
 
 	out := bytes.NewBuffer(make([]byte,0))
-	p.Print(out)
+	p.WriteTo(out)
 	t.Logf("Solution:\n")
 	t.Logf(out.String())
 }
@@ -85,7 +85,7 @@ func TestSolveTwo(t *testing.T) {
 	}
 
 	out := bytes.NewBuffer(make([]byte,0))
-	p.Print(out)
+	p.WriteTo(out)
 	t.Logf("Solution:\n")
 	t.Logf(out.String())
 }
@@ -106,7 +106,7 @@ func TestSolveLarge(t *testing.T) {
 	}
 
 	out := bytes.NewBuffer(make([]byte,0))
-	p.Print(out)
+	p.WriteTo(out)
 	t.Logf("Solution:\n")
 	t.Logf(out.String())
 }
