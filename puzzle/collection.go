@@ -18,6 +18,11 @@ type Collection struct {
 	Size    int
 }
 
+// Interface assertions. This appears to be the Go-ish way to assert "I implement an interface."
+var (
+	_ io.WriterTo = (*Collection)(nil)
+)
+
 // Read per the input format.
 func NewCollection(r io.Reader) (*Collection, error) {
 	buf := bufio.NewReader(r)
