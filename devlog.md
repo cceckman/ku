@@ -239,3 +239,17 @@ in a fairly arbitrary way (whenever there's an empty cell beween characters),
 but spaces between characters may or may not appear.
 
 So, I got one done... but that's rather excruciating.
+
+## 2016-07-18 Mon 14:07
+Hrm. So I have WriteTo for puzzles and collections, but not ReadFrom; the
+current way I'm doing scanning makes that difficult. Also, it's asymmetric;
+WriteTo for Puzzle doesn't produce something that the Puzzle can be recovered
+from (namely, doesn't have its size.)
+
+There could maybe be a better input format here; ignoring whitespace and
+newlines, just going based on number of characters read; or use newlines /
+spaces as delimiters, and make it able to just count up (e.g. 1-99 rather than
+1-P or whatever.)
+
+Man, all this fooling around with input formats makes me sad. Let's just write
+some code!
