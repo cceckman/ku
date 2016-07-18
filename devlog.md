@@ -223,3 +223,19 @@ specific process was
 
 Unfortunately, the conversion of the unsolved puzzle lost the layout entirely.
 So will need to go back and manually-ish create those cases.
+
+## 2016-07-18 Mon 12:57
+Greh. I thought this'd be easier than the last bit would indicate:
+
+- I downloaded the numeric puzzles, not the alphabetic ones; however, "numeric"
+  in this case means "a font that renders as numbers", so the convert-to-txt did
+  the right thing, mostly.
+- Even without spaces, I can still reproduce the puzzles; zero all characters in
+  the solution that don't match the corresponding line in the original. Since
+  all characters are unique-per-line, it should Just Work.
+
+Right? Well, the conversion did the right thing only mostly; line breaks appear
+in a fairly arbitrary way (whenever there's an empty cell beween characters),
+but spaces between characters may or may not appear.
+
+So, I got one done... but that's rather excruciating.

@@ -17,4 +17,5 @@ go_test(
         "//puzzle:go_default_library",
         "//verify:go_default_library",
     ],
+    size = "small",
 )
