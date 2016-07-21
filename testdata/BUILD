@@ -6,4 +6,3 @@ filegroup(
     name = "testdata",
     srcs = glob(["*.txt"]),
 )
-

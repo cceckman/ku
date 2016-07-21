@@ -253,3 +253,11 @@ spaces as delimiters, and make it able to just count up (e.g. 1-99 rather than
 
 Man, all this fooling around with input formats makes me sad. Let's just write
 some code!
+
+## 2016-07-21 Thu 14:13
+OK. I've got a size-4 testcase working. But clearly will need many more cases
+for performance testing.
+
+I could figure out how to download a database of what I want. Or I could wirte a
+generator as well as improving the solver- probably necessary that they go
+hand-in-hand.

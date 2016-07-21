@@ -72,6 +72,18 @@ func NewCollection(r io.Reader) (*Collection, error) {
 	return result, nil
 }
 
+// Makes a copy of this PuzzleCollection.
+func (c *Collection) Copy() (*Collection) {
+	r := &Collection{
+		Puzzles: make([]*Puzzle, len(c.Puzzles)),
+		Size: c.Size,
+	}
+	for i, p := range c.Puzzles {
+		r.Puzzles[i] = p.Copy()
+	}
+	return r
+}
+
 func (p *Collection) WriteTo(w io.Writer) (int64, error) {
 	var acc int64
 	sz, err := fmt.Fprintf(w, "%d %d\n", p.Size, len(p.Puzzles))
