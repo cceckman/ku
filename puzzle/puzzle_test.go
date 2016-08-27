@@ -8,28 +8,33 @@ import (
 )
 
 const (
-	tradPrefix = "3 2\n"
-	firstCase  = `Case 1
-000000001
-603091005
-079040080
-050074000
-000002006
-000030000
-504060090
-006008004
-300000700
+	collectionCase = `Test Collection
+2
+`
+	firstCase = `Case 1
+3
+0 0 0 0 0 0 0 0 1 
+6 0 3 0 9 1 0 0 5 
+0 7 9 0 4 0 0 8 0 
+0 5 0 0 7 4 0 0 0 
+0 0 0 0 0 2 0 0 6 
+0 0 0 0 3 0 0 0 0 
+5 0 4 0 6 0 0 9 0 
+0 0 6 0 0 8 0 0 4 
+3 0 0 0 0 0 7 0 0 
 `
 	secondCase = `Case 4
-198734265
-564192378
-273865914
-315427689
-849356721
-627918543
-736541892
-452689137
-981273456`
+3
+1 9 8 7 3 4 2 6 5 
+5 6 4 1 9 2 3 7 8 
+2 7 3 8 6 5 9 1 4 
+3 1 5 4 2 7 6 8 9 
+8 4 9 3 5 6 7 2 1 
+6 2 7 9 1 8 5 4 3 
+7 3 6 5 4 1 8 9 2 
+4 5 2 6 8 9 1 3 7 
+9 8 1 2 7 3 4 5 6
+`
 	firstName  = "Case 1"
 	secondName = "Case 4"
 	// TODO add >3x3 case
@@ -37,13 +42,14 @@ const (
 
 func TestCollection(t *testing.T) {
 	// TODO test invalid collections, e.g. 2 of the same name
-	prefixReader := strings.NewReader(tradPrefix)
 	firstReader := strings.NewReader(firstCase)
 	secondReader := strings.NewReader(secondCase)
-	catReader := io.MultiReader(prefixReader, firstReader, secondReader)
+	collectionReader := io.MultiReader(
+		strings.NewReader(collectionCase),
+		firstReader, secondReader)
 
 	expectedOutput := new(bytes.Buffer)
-	r := io.TeeReader(catReader, expectedOutput)
+	r := io.TeeReader(collectionReader, expectedOutput)
 
 	collection, err := NewCollection(r)
 	if err != nil {
@@ -63,7 +69,7 @@ func TestCollection(t *testing.T) {
 
 func TestSinglePuzzle(t *testing.T) {
 	firstReader := strings.NewReader(firstCase)
-	p, err := NewPuzzle(3, firstReader)
+	p, err := NewPuzzle(firstReader)
 	if err != nil {
 		t.Errorf("got error when loading first puzzle: %v", err)
 	}
@@ -153,11 +159,11 @@ func TestTwoPuzzles(t *testing.T) {
 	secondReader := strings.NewReader(secondCase)
 	r := io.MultiReader(firstReader, secondReader)
 
-	firstPuzzle, err := NewPuzzle(3, r)
+	firstPuzzle, err := NewPuzzle(r)
 	if err != nil {
 		t.Errorf("got error when loading first puzzle: %v", err)
 	}
-	secondPuzzle, err := NewPuzzle(3, r)
+	secondPuzzle, err := NewPuzzle(r)
 	if err != nil {
 		t.Errorf("got error when loading second puzzle: %v", err)
 	}

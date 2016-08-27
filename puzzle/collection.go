@@ -1,82 +1,64 @@
 package puzzle
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 )
 
-const (
-	maxdim = 5 // 1-9A-Z allows for at most 35 characters, so at most a 5x5 puzzle.
-	base   = maxdim * maxdim
-)
-
 type Collection struct {
+	Name    string
 	Puzzles []*Puzzle
-	Size    int
 }
 
 // Interface assertions. This appears to be the Go-ish way to assert "I implement an interface."
 var (
-	_ io.WriterTo = (*Collection)(nil)
+	_ io.ReaderFrom = (*Collection)(nil)
+	_ io.WriterTo   = (*Collection)(nil)
 )
 
-// Read per the input format.
+// Read a Collection. The input format is as follows:
+// The first line gives the name of the Collection.
+// The second line has one number: the number of puzzles in this Collection.
+// Then, the rest of the lines describe Puzzles per the Puzzle format.
 func NewCollection(r io.Reader) (*Collection, error) {
-	buf := bufio.NewReader(r)
-
-	// Scan for two ints: the size, and the number of test cases.
-	dimStr, err := buf.ReadString(' ')
-	if err != nil {
+	c := &Collection{}
+	if _, err := c.ReadFrom(r); err != nil {
 		return nil, err
 	}
+	return c, nil
+}
 
-	size, err := strconv.Atoi(strings.Trim(dimStr, " "))
-	if err != nil {
-		return nil, err
+func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
+	name := new(string)
+	if count, err := fmt.Fscanln(r, "%s", name); count != 1 || err != nil {
+		return int64(len(*name)), fmt.Errorf("error in scanning collection name: read %d, error: %v", count, err)
+	}
+	c.Name = strings.TrimSpace(*name)
+
+	var size int
+	if count, err := fmt.Fscanf(r, "%d", &size); count != 1 || err != nil {
+		return int64(count), fmt.Errorf("error in scanning size of collection '%s': read %d values, error: %v", c.Name, count, err)
 	}
 
-	if size > maxdim {
-		return nil, fmt.Errorf("dimension %d of input exceeds maximum size %d", size, maxdim)
-	}
+	c.Puzzles = make([]*Puzzle, size)
 
-	countStr, err := buf.ReadString('\n')
-	if err != nil {
-		return nil, err
-	}
-
-	count, err := strconv.Atoi(strings.Trim(countStr, "\n "))
-	if err != nil {
-		return nil, err
-	}
-
-	result := &Collection{Size: size}
-	names := make(map[string]bool)
-	for i := 0; i < count; i++ {
-		// Pass in the already-buffered reader, as it may have already forwarded the read pointer in 'r'
-		// past where we're interestd in.
-		puzzle, err := NewPuzzle(size, buf)
+	acc := int64(0)
+	for i := 0; i < size; i++ {
+		n, err := c.Puzzles[i].ReadFrom(r)
+		acc += n
 		if err != nil {
-			return nil, err
+			return acc, err
 		}
-
-		if _, ok := names[puzzle.Name]; ok {
-			return nil, fmt.Errorf("Duplicate puzzle name %s", puzzle.Name)
-		}
-		result.Puzzles = append(result.Puzzles, puzzle)
-		names[puzzle.Name] = true
 	}
-
-	return result, nil
+	return acc, nil
 }
 
 // Makes a copy of this PuzzleCollection.
-func (c *Collection) Copy() (*Collection) {
+func (c *Collection) Copy() *Collection {
 	r := &Collection{
 		Puzzles: make([]*Puzzle, len(c.Puzzles)),
-		Size: c.Size,
+		Name:    c.Name,
 	}
 	for i, p := range c.Puzzles {
 		r.Puzzles[i] = p.Copy()
@@ -86,11 +68,12 @@ func (c *Collection) Copy() (*Collection) {
 
 func (p *Collection) WriteTo(w io.Writer) (int64, error) {
 	var acc int64
-	sz, err := fmt.Fprintf(w, "%d %d\n", p.Size, len(p.Puzzles))
+	sz, err := fmt.Fprintf(w, "%s\n%d\n", p.Name, len(p.Puzzles))
 	acc += int64(sz)
 	if err != nil {
 		return acc, err
 	}
+
 	for _, puzzle := range p.Puzzles {
 		sz, err := puzzle.WriteTo(w)
 		acc += int64(sz)
