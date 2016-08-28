@@ -170,4 +170,10 @@ func TestSinglePuzzle(t *testing.T) {
 	if output.String() != firstCase {
 		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, firstCase)
 	}
+
+	// Write anyway if 'dump' was triggered
+	if dump {
+		t.Logf("Printed value: \n%v", output)
+	}
+
 }
