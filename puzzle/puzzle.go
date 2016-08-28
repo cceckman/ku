@@ -38,7 +38,7 @@ func NewPuzzle(r io.Reader) (*Puzzle, error) {
 func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 	name := new(string)
 	if c, err := fmt.Fscanln(r, "%s", name); c != 1 || err != nil {
-		return int64(len(*name)), fmt.Errorf("error in scanning collection name: read %d, error: %v", c, err)
+		return int64(len(*name)), fmt.Errorf("error in scanning puzzle name: read %d, error: %v", c, err)
 	}
 	p.Name = strings.TrimSpace(*name)
 
