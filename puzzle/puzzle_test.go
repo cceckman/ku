@@ -10,8 +10,7 @@ import (
 const (
 	collectionCase = `Test Collection
 2
-`
-	firstCase = `Case 1
+Case 1
 3
 0 0 0 0 0 0 0 0 1 
 6 0 3 0 9 1 0 0 5 
@@ -21,9 +20,8 @@ const (
 0 0 0 0 3 0 0 0 0 
 5 0 4 0 6 0 0 9 0 
 0 0 6 0 0 8 0 0 4 
-3 0 0 0 0 0 7 0 0 
-`
-	secondCase = `Case 4
+3 0 0 0 0 0 7 0 0
+Case 4
 3
 1 9 8 7 3 4 2 6 5 
 5 6 4 1 9 2 3 7 8 
@@ -38,15 +36,23 @@ const (
 	firstName  = "Case 1"
 	secondName = "Case 4"
 	// TODO add >3x3 case
+	firstCase = `Case 1
+3
+0 0 0 0 0 0 0 0 1 
+6 0 3 0 9 1 0 0 5 
+0 7 9 0 4 0 0 8 0 
+0 5 0 0 7 4 0 0 0 
+0 0 0 0 0 2 0 0 6 
+0 0 0 0 3 0 0 0 0 
+5 0 4 0 6 0 0 9 0 
+0 0 6 0 0 8 0 0 4 
+3 0 0 0 0 0 7 0 0
+`
 )
 
 func TestCollection(t *testing.T) {
 	// TODO test invalid collections, e.g. 2 of the same name
-	firstReader := strings.NewReader(firstCase)
-	secondReader := strings.NewReader(secondCase)
-	collectionReader := io.MultiReader(
-		strings.NewReader(collectionCase),
-		firstReader, secondReader)
+	collectionReader := strings.NewReader(collectionCase)
 
 	expectedOutput := new(bytes.Buffer)
 	r := io.TeeReader(collectionReader, expectedOutput)
@@ -73,9 +79,20 @@ func TestSinglePuzzle(t *testing.T) {
 	if err != nil {
 		t.Errorf("got error when loading first puzzle: %v", err)
 	}
+
+	// Check properties
 	if p.Name != firstName {
 		t.Errorf("puzzle name doesn't match. got: %v expected: %v", p.Name, firstName)
 	}
+	if p.Size != 3 {
+		t.Errorf("size doesn't match. got: %v expected: %v", p.Size, 3)
+	}
+	totallen := (3 * 3) * (3 * 3) // Two-dimensional, with size 3)
+	if len(p.Value) != totallen {
+		t.Errorf("data dimension doesn't match. got: %v expected: %v", len(p.Value), totallen)
+	}
+
+	dump := false
 
 	// Spot-check RowOf, ColOf, BoxOf; test case is index, row, column, box.
 	for n, test := range [][]int{
@@ -107,6 +124,7 @@ func TestSinglePuzzle(t *testing.T) {
 		for i := range row {
 			if p.Value[gotRow[i]] != row[i] {
 				t.Errorf("Row %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotRow[i]), row[i])
+				dump = true
 			}
 		}
 	}
@@ -122,6 +140,7 @@ func TestSinglePuzzle(t *testing.T) {
 		for i := range col {
 			if p.Value[gotCol[i]] != col[i] {
 				t.Errorf("Col %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotCol[i]), col[i])
+				dump = true
 			}
 		}
 	}
@@ -138,6 +157,7 @@ func TestSinglePuzzle(t *testing.T) {
 		for i := range box {
 			if p.Value[gotBox[i]] != box[i] {
 				t.Errorf("Box %d test failed: got: (%v)  expected value: %v", idx, p.CellInfo(gotBox[i]), box[i])
+				dump = true
 			}
 		}
 	}
@@ -149,37 +169,5 @@ func TestSinglePuzzle(t *testing.T) {
 	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
 	if output.String() != firstCase {
 		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, firstCase)
-	}
-}
-
-// TestTwoPuzzles confirms that reading one puzzle after another, from the same reader, works correctly.
-// This also gets tested as part of collection_test, but test it here explicitly.
-func TestTwoPuzzles(t *testing.T) {
-	firstReader := strings.NewReader(firstCase)
-	secondReader := strings.NewReader(secondCase)
-	r := io.MultiReader(firstReader, secondReader)
-
-	firstPuzzle, err := NewPuzzle(r)
-	if err != nil {
-		t.Errorf("got error when loading first puzzle: %v", err)
-	}
-	secondPuzzle, err := NewPuzzle(r)
-	if err != nil {
-		t.Errorf("got error when loading second puzzle: %v", err)
-	}
-	if firstPuzzle.Name != firstName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", firstPuzzle.Name, firstName)
-	}
-	if secondPuzzle.Name != secondName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", secondPuzzle.Name, secondName)
-	}
-
-	// Test "print"; should match input.
-	output := bytes.NewBuffer(make([]byte, 0, len(secondCase)))
-	secondPuzzle.WriteTo(output)
-
-	// NB: WriteTo always terminates with a newline, but it doesn't care whether there's a trailing newline.
-	if output.String() != (secondCase + "\n") {
-		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, secondCase)
 	}
 }

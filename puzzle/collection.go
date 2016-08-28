@@ -31,7 +31,6 @@ func NewCollection(r io.Reader) (*Collection, error) {
 }
 
 func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
-	// Mask with a buffered reader
 	bufr := bufio.NewReader(r)
 
 	if name, err := bufr.ReadString('\n'); err != nil {
@@ -41,7 +40,7 @@ func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
 	}
 
 	var size int
-	if count, err := fmt.Fscanf(bufr, "%d", &size); count != 1 || err != nil {
+	if count, err := fmt.Fscanln(bufr, &size); count != 1 || err != nil {
 		return int64(count), fmt.Errorf("error in scanning size of collection '%s': read %d values, error: %v", c.Name, count, err)
 	}
 
@@ -49,10 +48,11 @@ func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
 
 	acc := int64(0)
 	for i := 0; i < size; i++ {
-		n, err := c.Puzzles[i].ReadFrom(bufr)
-		acc += n
+		var err error
+		c.Puzzles[i], err = NewPuzzle(bufr)
+		acc += int64(i)
 		if err != nil {
-			return acc, err
+			return acc, fmt.Errorf("error constructing puzzle #%d: %v", i, err)
 		}
 	}
 	return acc, nil

@@ -1,6 +1,7 @@
 package puzzle
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -36,13 +37,15 @@ func NewPuzzle(r io.Reader) (*Puzzle, error) {
 }
 
 func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
-	name := new(string)
-	if c, err := fmt.Fscanln(r, "%s", name); c != 1 || err != nil {
-		return int64(len(*name)), fmt.Errorf("error in scanning puzzle name: read %d, error: %v", c, err)
-	}
-	p.Name = strings.TrimSpace(*name)
+	bufr := bufio.NewReader(r)
 
-	if c, err := fmt.Fscanf(r, "%d", &p.Size); c != 1 || err != nil {
+	if name, err := bufr.ReadString('\n'); err != nil {
+		return int64(len(name)), fmt.Errorf("error in scanning puzzle name: error: %v", err)
+	} else {
+		p.Name = strings.TrimSpace(name)
+	}
+
+	if c, err := fmt.Fscanln(bufr, &p.Size); c != 1 || err != nil {
 		return int64(c), fmt.Errorf("error in scanning size of puzzle '%s': read %d values, error: %v", p.Name, c, err)
 	}
 
@@ -51,15 +54,21 @@ func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 	}
 	p.len = p.Size * p.Size
 
-	p.Value = make([]uint64, p.len)
+	p.Value = make([]uint64, p.len * p.len)
 	acc := int64(0)
 
 	for x := 0; x < p.len; x++ {
-		c, err := fmt.Fscanf(r, "%x", &p.Value[x])
+		c, err := fmt.Fscan(bufr, &p.Value[x])
 		acc += int64(c)
 		if c != 1 || err != nil {
-			return acc, fmt.Errorf("error in reading position %d of puzzle '%s': read %d values, error: %v", x, name, c, err)
+			return acc, fmt.Errorf("error in reading position %d of puzzle '%s': read %d values, error: %v", x, p.Name, c, err)
 		}
+	}
+	// Read the last newline
+	c, err := fmt.Fscanln(bufr)
+	acc += int64(c)
+	if err != nil {
+		return acc, fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
 	}
 
 	return acc, nil
@@ -106,7 +115,7 @@ func (p *Puzzle) RowOf(cell int) int {
 	return cell / p.len
 }
 
-// Row gives the indeces of the cells in the given row.
+// Row gives the indices of the cells in the given row.
 func (p *Puzzle) Row(row int) []int {
 	r := make([]int, p.len)
 	for i := 0; i < p.len; i++ {
@@ -120,7 +129,7 @@ func (p *Puzzle) ColOf(cell int) int {
 	return cell % p.len
 }
 
-// Col gives the indeces of the cells in the given row.
+// Col gives the indices of the cells in the given row.
 func (p *Puzzle) Col(col int) []int {
 	r := make([]int, p.len)
 	for i := 0; i < p.len; i++ {
