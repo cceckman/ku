@@ -9,7 +9,8 @@ import (
 
 type Puzzle struct {
 	Name string
-	// The size, e.g. 3 for a standard Sudoku. Only "square" Sudoku are supported.
+	// The size, e.g. 3 for a standard Sudoku.
+	// Only "square" Sudoku are supported, and only up to 3 is supported at the moment.
 	Size int
 	// Size * Size
 	len int
@@ -25,9 +26,11 @@ var (
 
 // Load a single puzzle from the Reader.
 // The format is:
-// The name, on a line on its own
-// The size (e.g. 3) on a line on its own.
-// The data, with optional newlines within it, terminating with a newline.
+// The name, terminated by a space (must be a single word; dash and underscore are acceptable.)
+// The size (e.g. 3), followed by a space
+// The data, terminating with a space or newline, preferably in canonical form.
+//  Data is represented with one character per cell; 0 counts as an unfilled cell.
+//  Sizes greater than 3 are not currently supported.
 func NewPuzzle(r io.Reader) (*Puzzle, error) {
 	p := &Puzzle{}
 	if _, err := p.ReadFrom(r); err != nil {
@@ -37,41 +40,48 @@ func NewPuzzle(r io.Reader) (*Puzzle, error) {
 }
 
 func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
-	bufr := bufio.NewReader(r)
+	s := bufio.NewScanner(r)
+	s.Split(bufio.ScanWords)
 
-	if name, err := bufr.ReadString('\n'); err != nil {
-		return int64(len(name)), fmt.Errorf("error in scanning puzzle name: error: %v", err)
-	} else {
-		p.Name = strings.TrimSpace(name)
+	if ok := s.Scan(); ! ok {
+		return (0, s.Err())
+		p.Name = strings.TrimSpace(s.Text())
+
+	if ok := s.Scan(); ! ok {
+		return 0, fmt.Errorf("error in scanning size of puzzle '%s': %v", p.Name, s.Err())
 	}
 
-	if c, err := fmt.Fscanln(bufr, &p.Size); c != 1 || err != nil {
-		return int64(c), fmt.Errorf("error in scanning size of puzzle '%s': read %d values, error: %v", p.Name, c, err)
+	sz, err := strconv.ParseInt(string(s.Text()))
+	if err != nil {
+		return 0, fmt.Errorf("error in parsing size '%s' of puzzle '%s': %v",
+			s.Text(), p.Name, err)
 	}
+	p.Size = sz
+	p.len = sz * sz  // length of one side
 
-	if p.Size < 1 || p.Size > 3 {
-		return 0, fmt.Errorf("Size %d of puzzle '%s' is not supported", p.Size, p.Name)
-	}
-	p.len = p.Size * p.Size
-
+	// Scan each character, load them in.
 	p.Value = make([]uint64, p.len * p.len)
-	acc := int64(0)
 
 	for x := 0; x < p.len; x++ {
-		c, err := fmt.Fscan(bufr, &p.Value[x])
-		acc += int64(c)
-		if c != 1 || err != nil {
-			return acc, fmt.Errorf("error in reading position %d of puzzle '%s': read %d values, error: %v", x, p.Name, c, err)
+		if ok := s.Scan(); ! ok {
+			return 0, fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
 		}
+
+		v, err := strconv.ParseInt(string(s.Text()))
+		if err != nil {
+			return 0, fmt.Errorf("error in parsing value at position %d of puzzle '%s': %v",
+				x, p.Name, err)
+		}
+
+		p.Value[x] = v
 	}
 	// Read the last newline
-	c, err := fmt.Fscanln(bufr)
-	acc += int64(c)
+	_, err := fmt.Fscanln(r)
 	if err != nil {
 		return acc, fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
 	}
 
-	return acc, nil
+	return 0, nil
 }
 
 // Prints a puzzle to the Writer.
