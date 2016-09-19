@@ -40,20 +40,22 @@ func NewPuzzle(r io.Reader) (*Puzzle, error) {
 }
 
 func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
-	s := bufio.NewScanner(r)
+	cr := NewCountingReader(r)
+	s := bufio.NewScanner(cr)
 	s.Split(bufio.ScanWords)
 
 	if ok := s.Scan(); ! ok {
-		return (0, s.Err())
-		p.Name = strings.TrimSpace(s.Text())
+		return cr.Count, s.Err()
+	}
+	p.Name = strings.TrimSpace(s.Text())
 
 	if ok := s.Scan(); ! ok {
-		return 0, fmt.Errorf("error in scanning size of puzzle '%s': %v", p.Name, s.Err())
+		return cr.Count, fmt.Errorf("error in scanning size of puzzle '%s': %v", p.Name, s.Err())
 	}
 
 	sz, err := strconv.ParseInt(string(s.Text()))
 	if err != nil {
-		return 0, fmt.Errorf("error in parsing size '%s' of puzzle '%s': %v",
+		return cr.Count, fmt.Errorf("error in parsing size '%s' of puzzle '%s': %v",
 			s.Text(), p.Name, err)
 	}
 	p.Size = sz
@@ -64,12 +66,12 @@ func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 
 	for x := 0; x < p.len; x++ {
 		if ok := s.Scan(); ! ok {
-			return 0, fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
+			return cr.Count, fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
 		}
 
 		v, err := strconv.ParseInt(string(s.Text()))
 		if err != nil {
-			return 0, fmt.Errorf("error in parsing value at position %d of puzzle '%s': %v",
+			return cr.Count, fmt.Errorf("error in parsing value at position %d of puzzle '%s': %v",
 				x, p.Name, err)
 		}
 
@@ -78,10 +80,10 @@ func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 	// Read the last newline
 	_, err := fmt.Fscanln(r)
 	if err != nil {
-		return acc, fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
+		return cr.Count, fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
 	}
 
-	return 0, nil
+	return cr.Count, nil
 }
 
 // Prints a puzzle to the Writer.

@@ -9,6 +9,7 @@ go_library(
     srcs = [
         "collection.go",
         "puzzle.go",
+        "countio.go",
     ],
 )
 
@@ -17,6 +18,7 @@ go_test(
     size = "small",
     srcs = [
         "puzzle_test.go",
+        "countio_test.go",
     ],
     library = ":go_default_library",
 )
