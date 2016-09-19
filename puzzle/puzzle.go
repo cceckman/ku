@@ -1,10 +1,12 @@
 package puzzle
 
 import (
+	"bytes"
 	"bufio"
 	"fmt"
 	"io"
 	"strings"
+	"strconv"
 )
 
 type Puzzle struct {
@@ -15,7 +17,7 @@ type Puzzle struct {
 	// Size * Size
 	len int
 	// TODO : Support >2 dimensions.
-	Value []uint64
+	Value []int
 }
 
 // Interface assertions. This appears to be the Go-ish way to assert "I implement an interface."
@@ -45,81 +47,78 @@ func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 	s.Split(bufio.ScanWords)
 
 	if ok := s.Scan(); ! ok {
-		return cr.Count, s.Err()
+		return int64(cr.Count), s.Err()
 	}
 	p.Name = strings.TrimSpace(s.Text())
 
 	if ok := s.Scan(); ! ok {
-		return cr.Count, fmt.Errorf("error in scanning size of puzzle '%s': %v", p.Name, s.Err())
+		return int64(cr.Count), fmt.Errorf("error in scanning size of puzzle '%s': %v", p.Name, s.Err())
 	}
 
-	sz, err := strconv.ParseInt(string(s.Text()))
+	sz, err := strconv.ParseInt(s.Text(), 10, 32)
 	if err != nil {
-		return cr.Count, fmt.Errorf("error in parsing size '%s' of puzzle '%s': %v",
+		return int64(cr.Count), fmt.Errorf("error in parsing size '%s' of puzzle '%s': %v",
 			s.Text(), p.Name, err)
 	}
-	p.Size = sz
-	p.len = sz * sz  // length of one side
+	p.Size = int(sz)
+	p.len = int(sz * sz)  // length of one side
 
 	// Scan each character, load them in.
-	p.Value = make([]uint64, p.len * p.len)
+	p.Value = make([]int, p.len * p.len)
 
 	for x := 0; x < p.len; x++ {
 		if ok := s.Scan(); ! ok {
-			return cr.Count, fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
+			return int64(cr.Count), fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
 		}
 
-		v, err := strconv.ParseInt(string(s.Text()))
+		v, err := strconv.ParseInt(s.Text(), 10, 64)
 		if err != nil {
-			return cr.Count, fmt.Errorf("error in parsing value at position %d of puzzle '%s': %v",
+			return int64(cr.Count), fmt.Errorf("error in parsing value at position %d of puzzle '%s': %v",
 				x, p.Name, err)
 		}
 
-		p.Value[x] = v
+		p.Value[x] = int(v)
 	}
 	// Read the last newline
-	_, err := fmt.Fscanln(r)
+	_, err = fmt.Fscanln(r)
 	if err != nil {
-		return cr.Count, fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
+		return int64(cr.Count), fmt.Errorf("error in reading line at end of puzzle '%s': %v", err)
 	}
 
-	return cr.Count, nil
+	return int64(cr.Count), nil
 }
 
 // Prints a puzzle to the Writer.
 func (p *Puzzle) WriteTo(w io.Writer) (int64, error) {
-	var acc int64
+	// Buffer the output, flush at the end
+	b := bytes.NewBufferString("")
+
 	// Name
-	sz, err := fmt.Fprintf(w, "%s\n", p.Name)
-	acc += int64(sz)
-	if err != nil {
-		return acc, err
+	if strings.Contains(p.Name, " ") {
+		return 0, fmt.Errorf("Name of puzzle '%s' contains a space",
+			p.Name)
 	}
-	// Size
-	sz, err = fmt.Fprintf(w, "%d\n", p.Size)
-	acc += int64(sz)
-	if err != nil {
-		return acc, err
+	if _, err := b.WriteString(p.Name + " "); err != nil {
+		return 0, err
 	}
 
-	// Lines
-	for i := 0; i < p.len; i++ {
-		// Columns
-		for j := 0; j < p.len; j++ {
-			v := p.Value[i*p.len+j]
-			sz, err = fmt.Fprintf(w, "%x ", v)
-			acc += int64(sz)
-			if err != nil {
-				return acc, err
-			}
-		}
-		sz, err := fmt.Fprintln(w, "")
-		acc += int64(sz)
-		if err != nil {
-			return acc, err
+	// Size
+	if _, err := b.WriteString(strconv.Itoa(p.Size) + " "); err != nil {
+		return 0, err
+	}
+
+	// Contents
+	for _, v := range p.Value {
+		if _, err := b.WriteString(strconv.Itoa(v)); err != nil {
+			return 0, err
 		}
 	}
-	return acc, nil
+
+	if _, err := b.WriteString("\n"); err != nil {
+		return 0, err
+	}
+
+	return b.WriteTo(w)
 }
 
 // RowOf gives the row of the given cell.
@@ -202,8 +201,8 @@ func (p *Puzzle) Box(box int) []int {
 }
 
 // Get all the values at the given indices.
-func (p *Puzzle) Values(idx []int) []uint64 {
-	results := make([]uint64, len(idx))
+func (p *Puzzle) Values(idx []int) []int {
+	results := make([]int, len(idx))
 	for i, n := range idx {
 		results[i] = p.Value[n]
 	}
@@ -215,7 +214,7 @@ func (p *Puzzle) Copy() *Puzzle {
 	newp := &Puzzle{
 		Name:  p.Name,
 		Size:  p.Size,
-		Value: make([]uint64, len(p.Value)),
+		Value: make([]int, len(p.Value)),
 	}
 	for i := range p.Value {
 		newp.Value[i] = p.Value[i]

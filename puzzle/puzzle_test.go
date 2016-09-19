@@ -112,10 +112,10 @@ func TestSinglePuzzle(t *testing.T) {
 		}
 	}
 	// Spot-check Row:
-	for idx, row := range map[int][]uint64{
-		0: []uint64{0, 0, 0, 0, 0, 0, 0, 0, 1},
-		6: []uint64{5, 0, 4, 0, 6, 0, 0, 9, 0},
-		8: []uint64{3, 0, 0, 0, 0, 0, 7, 0, 0},
+	for idx, row := range map[int][]int{
+		0: []int{0, 0, 0, 0, 0, 0, 0, 0, 1},
+		6: []int{5, 0, 4, 0, 6, 0, 0, 9, 0},
+		8: []int{3, 0, 0, 0, 0, 0, 7, 0, 0},
 	} {
 		gotRow := p.Row(idx)
 		if len(gotRow) != len(row) {
@@ -129,9 +129,9 @@ func TestSinglePuzzle(t *testing.T) {
 		}
 	}
 	// Spot-check Col:
-	for idx, col := range map[int][]uint64{
-		0: []uint64{0, 6, 0, 0, 0, 0, 5, 0, 3},
-		4: []uint64{0, 9, 4, 7, 0, 3, 6, 0, 0},
+	for idx, col := range map[int][]int{
+		0: []int{0, 6, 0, 0, 0, 0, 5, 0, 3},
+		4: []int{0, 9, 4, 7, 0, 3, 6, 0, 0},
 	} {
 		gotCol := p.Col(idx)
 		if len(gotCol) != len(col) {
@@ -145,10 +145,10 @@ func TestSinglePuzzle(t *testing.T) {
 		}
 	}
 	// Spot-check Box:
-	for idx, box := range map[int][]uint64{
-		0: []uint64{0, 0, 0, 6, 0, 3, 0, 7, 9},
-		3: []uint64{0, 5, 0, 0, 0, 0, 0, 0, 0},
-		8: []uint64{0, 9, 0, 0, 0, 4, 7, 0, 0},
+	for idx, box := range map[int][]int{
+		0: []int{0, 0, 0, 6, 0, 3, 0, 7, 9},
+		3: []int{0, 5, 0, 0, 0, 0, 0, 0, 0},
+		8: []int{0, 9, 0, 0, 0, 4, 7, 0, 0},
 	} {
 		gotBox := p.Box(idx)
 		if len(gotBox) != len(box) {
