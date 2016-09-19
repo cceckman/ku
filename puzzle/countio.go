@@ -16,7 +16,7 @@ var (
 	_ io.Writer   = (*CountingWriter)(nil)
 )
 
-type CountingReader {
+type CountingReader struct {
 	wrap io.Reader
 	Count int
 }
@@ -26,22 +26,22 @@ func NewCountingReader(r io.Reader) *CountingReader {
 }
 
 func (c *CountingReader) Read(p []byte) (n int, err error) {
-	n, err = wrap.Read()
+	n, err = c.wrap.Read(p)
 	c.Count += n
 	return
 }
 
-type CountingWriteer {
-	wrap io.Writeer
+type CountingWriter struct {
+	wrap io.Writer
 	Count int
 }
 
-func NewCountingWriteer(r io.Writeer) *CountingWriteer {
-	return &CountingWriteer { wrap: r }
+func NewCountingWriter(r io.Writer) *CountingWriter {
+	return &CountingWriter { wrap: r }
 }
 
-func (c *CountingWriteer) Write(p []byte) (n int, err error) {
-	n, err = wrap.Write()
+func (c *CountingWriter) Write(p []byte) (n int, err error) {
+	n, err = c.wrap.Write(p)
 	c.Count += n
 	return
 }
