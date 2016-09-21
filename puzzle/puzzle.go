@@ -31,7 +31,8 @@ var (
 // The name, terminated by a space (must be a single word; dash and underscore are acceptable.)
 // The size (e.g. 3), followed by a space
 // The data, terminating with a space or newline, preferably in canonical form.
-//  Data is represented with one character per cell; 0 counts as an unfilled cell.
+//  Data is represented with one whitespace-separated word per cell;
+//  0 counts as an unfilled cell.
 //  Sizes greater than 3 are not currently supported.
 func NewPuzzle(r io.Reader) (*Puzzle, error) {
 	p := &Puzzle{}
@@ -63,10 +64,10 @@ func (p *Puzzle) ReadFrom(r io.Reader) (int64, error) {
 	p.Size = int(sz)
 	p.len = int(sz * sz)  // length of one side
 
-	// Scan each character, load them in.
+	// Scan each word, load them in
 	p.Value = make([]int, p.len * p.len)
 
-	for x := 0; x < p.len; x++ {
+	for x := range p.Value {
 		if ok := s.Scan(); ! ok {
 			return int64(cr.Count), fmt.Errorf("error in reading position %d of puzzle '%s': %v", x, p.Name, err)
 		}
@@ -103,13 +104,19 @@ func (p *Puzzle) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// Size
-	if _, err := b.WriteString(strconv.Itoa(p.Size) + " "); err != nil {
+	if _, err := b.WriteString(strconv.Itoa(p.Size)); err != nil {
 		return 0, err
 	}
 
 	// Contents
-	for _, v := range p.Value {
-		if _, err := b.WriteString(strconv.Itoa(v)); err != nil {
+	for i, v := range p.Value {
+		// Whitespace-separated
+		sep := " "
+		if i % p.len == 0 {
+			sep = "\n"
+		}
+
+		if _, err := b.WriteString(sep + strconv.Itoa(v)); err != nil {
 			return 0, err
 		}
 	}

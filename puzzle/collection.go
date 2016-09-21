@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strings"
 )
 
 type Collection struct {
@@ -18,9 +17,9 @@ var (
 	_ io.WriterTo   = (*Collection)(nil)
 )
 
-// Read a Collection. The input format is as follows:
-// The first line gives the name of the Collection.
-// The second line has one number: the number of puzzles in this Collection.
+// Read a Collection. 
+// The first line contains the name of the collection (which has no spaces),
+// followed by a space, followed by the number of puzzles in this collection.
 // Then, the rest of the lines describe Puzzles per the Puzzle format.
 func NewCollection(r io.Reader) (*Collection, error) {
 	c := &Collection{}
@@ -31,31 +30,29 @@ func NewCollection(r io.Reader) (*Collection, error) {
 }
 
 func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
-	bufr := bufio.NewReader(r)
+	cr := NewCountingReader(r)
+	s := bufio.NewScanner(cr)
+	s.Split(bufio.ScanLines)
 
-	if name, err := bufr.ReadString('\n'); err != nil {
-		return int64(len(name)), fmt.Errorf("error in scanning collection name: error: %v", err)
-	} else {
-		c.Name = strings.TrimSpace(name)
+	if ok := s.Scan(); ! ok {
+		return int64(cr.Count), s.Err()
 	}
 
-	var size int
-	if count, err := fmt.Fscanln(bufr, &size); count != 1 || err != nil {
-		return int64(count), fmt.Errorf("error in scanning size of collection '%s': read %d values, error: %v", c.Name, count, err)
-	}
+	// Split the first line by space...
+	_ = s.Text()
+	// DO NOT SUBMIT - TODO
 
-	c.Puzzles = make([]*Puzzle, size)
-
-	acc := int64(0)
-	for i := 0; i < size; i++ {
-		var err error
-		c.Puzzles[i], err = NewPuzzle(bufr)
-		acc += int64(i)
+	// While there are lines to scan
+	for i := 0; i < len(c.Puzzles); i++ {
+		p, err := NewPuzzle(r)
 		if err != nil {
-			return acc, fmt.Errorf("error constructing puzzle #%d: %v", i, err)
+			return int64(cr.Count), fmt.Errorf("error reading puzzle %d in collection '%s': %v",
+				i, c.Name, err)
 		}
+		c.Puzzles[i] = p
 	}
-	return acc, nil
+
+	return int64(cr.Count), nil
 }
 
 // Makes a copy of this PuzzleCollection.
