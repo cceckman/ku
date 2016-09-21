@@ -2,6 +2,9 @@ package puzzle
 
 import (
 	"bufio"
+	"bytes"
+	"strings"
+	"strconv"
 	"fmt"
 	"io"
 )
@@ -39,12 +42,28 @@ func (c *Collection) ReadFrom(r io.Reader) (int64, error) {
 	}
 
 	// Split the first line by space...
-	_ = s.Text()
-	// DO NOT SUBMIT - TODO
+	buf := bytes.NewBufferString(s.Text())
+	sp := bufio.NewScanner(buf)
+	sp.Split(bufio.ScanWords)
+	// Get name
+	if ok := sp.Scan(); ! ok {
+		return int64(cr.Count), sp.Err()
+	}
+	c.Name = strings.TrimSpace(sp.Text())
+	// Get count
+	if ok := sp.Scan(); ! ok {
+		return int64(cr.Count), sp.Err()
+	}
+	sz, err := strconv.ParseInt(sp.Text(), 10, 32)
+	if err != nil {
+		return int64(cr.Count), fmt.Errorf("error in parsing size '%s' of collection '%s': %v",
+			sp.Text(), c.Name, err)
+	}
+	c.Puzzles = make([]*Puzzle, sz)
 
 	// While there are lines to scan
-	for i := 0; i < len(c.Puzzles); i++ {
-		p, err := NewPuzzle(r)
+	for i := range c.Puzzles {
+		p, err := NewPuzzle(cr)
 		if err != nil {
 			return int64(cr.Count), fmt.Errorf("error reading puzzle %d in collection '%s': %v",
 				i, c.Name, err)
@@ -68,19 +87,19 @@ func (c *Collection) Copy() *Collection {
 }
 
 func (p *Collection) WriteTo(w io.Writer) (int64, error) {
-	var acc int64
-	sz, err := fmt.Fprintf(w, "%s\n%d\n", p.Name, len(p.Puzzles))
-	acc += int64(sz)
+	cw := NewCountingWriter(w)
+
+	_, err := fmt.Fprintf(w, "%s %d\n", p.Name, len(p.Puzzles))
 	if err != nil {
-		return acc, err
+		return int64(cw.Count), err
 	}
 
 	for _, puzzle := range p.Puzzles {
-		sz, err := puzzle.WriteTo(w)
-		acc += int64(sz)
+		_, err := puzzle.WriteTo(w)
 		if err != nil {
-			return acc, err
+			return int64(cw.Count), err
 		}
 	}
-	return acc, nil
+
+	return int64(cw.Count), nil
 }

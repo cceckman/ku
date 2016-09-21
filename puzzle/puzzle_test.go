@@ -10,28 +10,26 @@ import (
 const (
 	collectionCase = `test-collection 2
 case-1 3
-0 0 0 0 0 0 0 0 1 
-6 0 3 0 9 1 0 0 5 
-0 7 9 0 4 0 0 8 0 
-0 5 0 0 7 4 0 0 0 
-0 0 0 0 0 2 0 0 6 
-0 0 0 0 3 0 0 0 0 
-5 0 4 0 6 0 0 9 0 
-0 0 6 0 0 8 0 0 4 
+0 0 0 0 0 0 0 0 1
+6 0 3 0 9 1 0 0 5
+0 7 9 0 4 0 0 8 0
+0 5 0 0 7 4 0 0 0
+0 0 0 0 0 2 0 0 6
+0 0 0 0 3 0 0 0 0
+5 0 4 0 6 0 0 9 0
+0 0 6 0 0 8 0 0 4
 3 0 0 0 0 0 7 0 0
 case-2 3
-1 9 8 7 3 4 2 6 5 
-5 6 4 1 9 2 3 7 8 
-2 7 3 8 6 5 9 1 4 
-3 1 5 4 2 7 6 8 9 
-8 4 9 3 5 6 7 2 1 
-6 2 7 9 1 8 5 4 3 
-7 3 6 5 4 1 8 9 2 
-4 5 2 6 8 9 1 3 7 
+1 9 8 7 3 4 2 6 5
+5 6 4 1 9 2 3 7 8
+2 7 3 8 6 5 9 1 4
+3 1 5 4 2 7 6 8 9
+8 4 9 3 5 6 7 2 1
+6 2 7 9 1 8 5 4 3
+7 3 6 5 4 1 8 9 2
+4 5 2 6 8 9 1 3 7
 9 8 1 2 7 3 4 5 6
 `
-	firstName  = "case-1"
-	secondName = "case-2"
 	firstCase = `case-1 3
 0 0 0 0 0 0 0 0 1
 6 0 3 0 9 1 0 0 5
@@ -45,6 +43,14 @@ case-2 3
 `
 )
 
+var(
+	names = []string{
+		"case-1",
+		"case-2",
+	}
+)
+
+
 func TestCollection(t *testing.T) {
 	// TODO test invalid collections, e.g. 2 of the same name
 	collectionReader := strings.NewReader(collectionCase)
@@ -57,12 +63,18 @@ func TestCollection(t *testing.T) {
 		t.Fatalf("couldn't create Collection: %v", err)
 	}
 
+	for i, name := range names {
+		if collection.Puzzles[i].Name != name {
+			t.Errorf("Puzzle %d had wrong name: got: %s expected: %s",
+				i, collection.Puzzles[i].Name, name,
+			)
+		}
+	}
+
 	// Test "print"; should match the input read.
 	output := new(bytes.Buffer)
 	collection.WriteTo(output)
 
-	// NB: Print always terminates with a newline, but it doesn't care whether there's a trailing newline.
-	expectedOutput.WriteString("\n")
 	if output.String() != expectedOutput.String() {
 		t.Errorf("Print failed:\ngot:\n%v\nexpected:\n%v\n---\n", output, expectedOutput.String())
 	}
@@ -76,8 +88,8 @@ func TestSinglePuzzle(t *testing.T) {
 	}
 
 	// Check properties
-	if p.Name != firstName {
-		t.Errorf("puzzle name doesn't match. got: %v expected: %v", p.Name, firstName)
+	if p.Name != names[0] {
+		t.Errorf("puzzle name doesn't match. got: %v expected: %v", p.Name, names[0])
 	}
 	if p.Size != 3 {
 		t.Errorf("size doesn't match. got: %v expected: %v", p.Size, 3)
